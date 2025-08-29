@@ -1,0 +1,36 @@
+:root {
+	--bg-1: hsl(0, 0%, 7%);
+	--bg-2: hsl(0, 0%, 11%);
+	--txt-0: hsl(60, 10%, 90%);
+	--txt-1: hsl(60, 10%, 80%);
+	--txt-2: hsl(60, 10%, 60%);
+	font-family: DM Mono;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--bg-1);
+	color: var(--txt-1);
+	height: 100%;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	color: var(--txt-0);
+	font-weight: 500;
+}

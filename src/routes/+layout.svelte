@@ -1,11 +1,21 @@
 <script>
-	import favicon from '$lib/assets/favicon.svg';
+	import '../app.css';
+
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 
 	let { children } = $props();
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<title>forklift</title>
 </svelte:head>
 
-{@render children?.()}
+<header></header>
+
+<main class="main-content">
+	{@render children?.()}
+</main>
+
+<style>
+</style>
