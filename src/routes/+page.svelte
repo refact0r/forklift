@@ -20,28 +20,44 @@
 	}
 </script>
 
-<main class="container">
-	<h1>forklift</h1>
-	<p class="subtitle">find repositories, understand codebases, and start contributing.</p>
-
-	<div class="search-section">
-		<div class="search-box">
+<div class="content">
+	<div class="container">
+		<h1>forklift</h1>
+		<p class="subtitle">find repositories, understand codebases, and start contributing.</p>
+		<div class="search">
 			<input
 				type="text"
 				bind:value={repoUrl}
-				placeholder="Enter GitHub repository URL (e.g., https://github.com/owner/repo)"
+				placeholder="enter github repository url"
 				onkeydown={(e) => e.key === 'Enter' && handleSearch()}
 			/>
-			<button onclick={handleSearch}>GO</button>
+			<button onclick={handleSearch}>start</button>
 		</div>
+		<div class="suggestions"></div>
 	</div>
-
-	<div class="suggestions"></div>
-</main>
+</div>
 
 <style>
 	h1 {
-		font-size: 6rem;
+		font-size: 4rem;
 		margin: 0;
+	}
+
+	.content {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.container {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.search {
+		display: flex;
+		gap: 1rem;
+		max-width: 50rem;
 	}
 </style>

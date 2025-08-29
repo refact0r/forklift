@@ -13,9 +13,13 @@
 
 <header></header>
 
-<main class="main-content">
+<main>
 	{@render children?.()}
 </main>
 
 <style>
+	main {
+		margin: 3rem;
+		width: 100%;
+	}
 </style>

@@ -2,8 +2,8 @@
 	--bg-1: hsl(0, 0%, 7%);
 	--bg-2: hsl(0, 0%, 11%);
 	--txt-0: hsl(60, 10%, 90%);
-	--txt-1: hsl(60, 10%, 80%);
-	--txt-2: hsl(60, 10%, 60%);
+	--txt-1: hsl(60, 10%, 75%);
+	--txt-2: hsl(60, 5%, 40%);
 	font-family: DM Mono;
 }
 
@@ -12,14 +12,14 @@
 }
 
 html {
-	height: 100%;
 }
 
 body {
 	margin: 0;
 	background: var(--bg-1);
 	color: var(--txt-1);
-	height: 100%;
+	min-height: 100vh;
+	display: flex;
 }
 
 a {
@@ -33,4 +33,25 @@ h3,
 h4 {
 	color: var(--txt-0);
 	font-weight: 500;
+}
+
+button {
+	font: inherit;
+	border: none;
+	color: inherit;
+	background: var(--bg-2);
+	padding: 0.5rem;
+}
+
+input {
+	font: inherit;
+	border: none;
+	color: inherit;
+	background: var(--bg-2);
+	outline: none;
+}
+
+input[type='text'] {
+	width: 100%;
+	padding: 0.5rem;
 }
