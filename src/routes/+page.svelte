@@ -22,7 +22,7 @@
 	}
 
 	function generateContributionData() {
-		const cols = 20;
+		const cols = 24;
 		const rows = 7;
 		const data = [];
 
@@ -56,10 +56,11 @@
 			<div class="right">
 				<div class="graph-container">
 					<div class="month-labels">
-						<span style="grid-column: 1 / 6;">Nov</span>
-						<span style="grid-column: 6 / 11;">Dec</span>
-						<span style="grid-column: 11 / 16;">Jan</span>
-						<span style="grid-column: 16 / 21;">Feb</span>
+						<span style="grid-column: 1 / 6;">Sep</span>
+						<span style="grid-column: 6 / 10;">Nov</span>
+						<span style="grid-column: 11 / 16;">Dec</span>
+						<span style="grid-column: 16 / 21;">Jan</span>
+						<span style="grid-column: 21 / 25;">Feb</span>
 					</div>
 
 					<div class="graph-with-days">
@@ -110,15 +111,13 @@
 			</div>
 			<button onclick={handleSearch}>start</button>
 		</div>
-
-		<!-- suggestions -->
 	</div>
 </div>
 
 <style>
 	h1 {
-		margin: 0 0 0.5rem 0;
-		font-size: 2.5rem;
+		margin: 0 0 1.5rem 0;
+		font-size: 3rem;
 		line-height: 1.1;
 
 		span {
@@ -137,13 +136,13 @@
 	.container {
 		display: flex;
 		flex-direction: column;
-		max-width: 50rem;
+		max-width: 60rem;
 	}
 
 	.hero {
 		margin: 2rem 0;
 		display: flex;
-		gap: 3rem;
+		gap: 4rem;
 	}
 
 	p {
@@ -176,12 +175,15 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
+
+		--gap: 4px;
+		--width: 14px;
 	}
 
 	.month-labels {
 		display: grid;
-		grid-template-columns: repeat(20, 1fr);
-		gap: 3px;
+		grid-template-columns: repeat(24, 1fr);
+		gap: var(--gap);
 		margin-bottom: 0.25rem;
 		padding-left: 2rem;
 		font-size: 0.75rem;
@@ -196,7 +198,7 @@
 	.day-labels {
 		display: flex;
 		flex-direction: column;
-		gap: 3px;
+		gap: var(--gap);
 		font-size: 0.75rem;
 		width: 1.5rem;
 		text-align: right;
@@ -212,19 +214,19 @@
 
 	.graph-grid {
 		display: flex;
-		gap: 3px;
+		gap: var(--gap);
 		margin-bottom: 1rem;
 	}
 
 	.week {
 		display: flex;
 		flex-direction: column;
-		gap: 3px;
+		gap: var(--gap);
 	}
 
 	.day {
-		width: 12px;
-		height: 12px;
+		width: var(--width);
+		height: var(--width);
 	}
 
 	.graph-legend {
@@ -237,12 +239,12 @@
 
 	.legend-squares {
 		display: flex;
-		gap: 3px;
+		gap: var(--gap);
 	}
 
 	.legend-square {
-		width: 12px;
-		height: 12px;
+		width: var(--width);
+		height: var(--width);
 	}
 
 	.level-0 {
