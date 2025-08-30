@@ -29,8 +29,8 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
-		"marked": "^16.2.1",
 		"@supabase/supabase-js": "^2.56.1",
+		"marked": "^16.2.1",
 		"openai": "^5.16.0"
 	}
 }

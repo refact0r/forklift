@@ -7,6 +7,7 @@
 	import UserIcon from '~icons/ph/user';
 	import SignOutIcon from '~icons/ph/sign-out';
 	import UserCircleIcon from '~icons/ph/user-circle';
+	import RepoIcon from '~icons/ph/folder';
 	import { auth } from '$lib/auth.svelte.js';
 
 	let { children } = $props();
