@@ -31,9 +31,9 @@
 	}
 </script>
 
-<main class="container">
+<div class="content">
 	<div class="header">
-		<button class="back-btn" onclick={goBack}>← Back to Search</button>
+		<a class="button" href="/" onclick={goBack}>back</a>
 		<h1>{data.owner}/{data.repo}</h1>
 		{#if repoData.url}
 			<a href={repoData.url} target="_blank" rel="noopener noreferrer" class="github-link">
@@ -104,7 +104,7 @@
 			<button class="primary-btn" onclick={goToIssues}>View Open Issues</button>
 		</div>
 	{/if}
-</main>
+</div>
 
 <style>
 </style>

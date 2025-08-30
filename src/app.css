@@ -1,12 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
 
 :root {
-	--bg-1: hsl(0, 0%, 7%);
-	--bg-2: hsl(0, 0%, 11%);
-	--bg-3: hsl(0, 0%, 15%);
 	--txt-0: hsl(60, 10%, 90%);
-	--txt-1: hsl(60, 10%, 75%);
-	--txt-2: hsl(60, 5%, 40%);
+	--txt-1: hsl(60, 8%, 75%);
+	--txt-2: hsl(60, 6%, 50%);
+	--txt-3: hsl(60, 4%, 30%);
+	--bg-3: hsl(60, 10%, 16%);
+	--bg-2: hsl(60, 10%, 11%);
+	--bg-1: hsl(60, 10%, 6%);
+	--acc-1: hsl(60, 60%, 60%);
 	font-family: 'DM Mono', monospace;
 	font-weight: 300;
 }
@@ -24,6 +26,7 @@ body {
 	color: var(--txt-1);
 	min-height: 100vh;
 	display: flex;
+	flex-direction: column;
 }
 
 a {
@@ -31,12 +34,21 @@ a {
 	text-decoration: none;
 }
 
+a.button {
+	padding: 0.5rem;
+	background: var(--bg-2);
+
+	&:hover {
+		background: var(--bg-3);
+	}
+}
+
 h1,
 h2,
 h3,
 h4 {
 	color: var(--txt-0);
-	font-weight: 500;
+	font-weight: 300;
 }
 
 button {
@@ -44,7 +56,8 @@ button {
 	border: none;
 	color: inherit;
 	background: var(--bg-2);
-	padding: 0.5rem;
+	border: 1px solid var(--bg-3);
+	padding: 0.75rem;
 	cursor: pointer;
 
 	&:hover {
@@ -56,11 +69,14 @@ input {
 	font: inherit;
 	border: none;
 	color: inherit;
-	background: var(--bg-2);
 	outline: none;
+	background: none;
+	width: 100%;
+}
+input::placeholder {
+	color: var(--txt-3);
 }
 
-input[type='text'] {
-	width: 100%;
-	padding: 0.5rem;
+.icon {
+	color: inherit;
 }
