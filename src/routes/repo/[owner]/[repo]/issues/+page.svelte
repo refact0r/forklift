@@ -45,66 +45,55 @@
 </script>
 
 {#if error}
-	<div class="error-section">
-		<p>Could not load issues: {error}</p>
+	<div class="error-message">
+		<h2>Error Loading Issues</h2>
+		<p>{error}</p>
+		<p>Please check that the repository exists and has public issues.</p>
 	</div>
+{:else if issues.length === 0}
+	<div class="no-issues">
+		<h2>No Open Issues Found</h2>
+		<p>This repository doesn't have any open issues at the moment.</p>
+		<p>
+			You can still explore the codebase and consider contributing documentation or improvements!
+		</p>
+	</div>
+{:else}
+	<div class="issues-container">
+		<div class="issues-header">
+			<h2>Available Issues ({issues.length})</h2>
+		</div>
 
-	{#if error}
-		<div class="error-message">
-			<h2>Error Loading Issues</h2>
-			<p>{error}</p>
-			<p>Please check that the repository exists and has public issues.</p>
-		</div>
-	{:else if issues.length === 0}
-		<div class="no-issues">
-			<h2>No Open Issues Found</h2>
-			<p>This repository doesn't have any open issues at the moment.</p>
-			<p>
-				You can still explore the codebase and consider contributing documentation or improvements!
-			</p>
-		</div>
-	{:else}
-		<div class="issues-container">
-			<div class="issues-header">
-				<h2>Available Issues ({issues.length})</h2>
+		<div class="issues-table">
+			<div class="table-header">
+				<div class="col-number">#</div>
+				<div class="col-title">Title</div>
+				<div class="col-difficulty">Difficulty</div>
+				<div class="col-action">Action</div>
 			</div>
 
-			<div class="issues-table">
-				<div class="table-header">
-					<div class="col-number">#</div>
-					<div class="col-title">Title</div>
-					<div class="col-difficulty">Difficulty</div>
-					<div class="col-action">Action</div>
-				</div>
-
-				{#each issues as issue}
-					<div class="issue-row">
-						<div class="col-number">{issue.number}</div>
-						<div class="col-title">
-							<span class="issue-title">{issue.title}</span>
-						</div>
-						<div class="col-difficulty">
-							<span 
-								class="difficulty-badge"
-								style="background-color: {getDifficultyColor(issue.difficulty)}"
-							>
-								{getDifficultyLabel(issue.difficulty)}
-							</span>
-						</div>
-						<div class="col-action">
-							<button 
-								class="solve-btn" 
-								onclick={() => openInGitHub(issue)}
-							>
-								View Issue
-							</button>
-						</div>
+			{#each issues as issue}
+				<div class="issue-row">
+					<div class="col-number">{issue.number}</div>
+					<div class="col-title">
+						<span class="issue-title">{issue.title}</span>
 					</div>
-				{/each}
-			</div>
+					<div class="col-difficulty">
+						<span
+							class="difficulty-badge"
+							style="background-color: {getDifficultyColor(issue.difficulty)}"
+						>
+							{getDifficultyLabel(issue.difficulty)}
+						</span>
+					</div>
+					<div class="col-action">
+						<button class="solve-btn" onclick={() => openInGitHub(issue)}> View Issue </button>
+					</div>
+				</div>
+			{/each}
 		</div>
-	{/if}
-</main>
+	</div>
+{/if}
 
 <style>
 	.container {
