@@ -5,11 +5,15 @@
 	import XIcon from '~icons/ph/x';
 	import { auth } from '$lib/auth.svelte.js';
 	import { supabase } from '$lib/supabase.js';
+	import { savedRepos } from '$lib/savedRepos.svelte.js';
+	import RepoCard from '$lib/components/RepoCard.svelte';
 
 	let languages = $state([]);
 	let newLanguage = $state('');
 	let loading = $state(true);
 	let saving = $state(false);
+	let displayLimit = $state(10);
+	let loadingMore = $state(false);
 
 	onMount(async () => {
 		// Redirect if not authenticated
@@ -19,6 +23,7 @@
 		}
 		
 		await loadLanguages();
+		await savedRepos.loadSavedRepos();
 		loading = false;
 	});
 
@@ -82,6 +87,16 @@
 			addLanguage();
 		}
 	}
+
+	async function loadMore() {
+		if (loadingMore) return;
+		
+		loadingMore = true;
+		// Simulate loading delay for better UX
+		await new Promise(resolve => setTimeout(resolve, 300));
+		displayLimit += 10;
+		loadingMore = false;
+	}
 </script>
 
 <div class="content">
@@ -92,12 +107,12 @@
 	{:else}
 		<div class="profile-header">
 			<h1>{auth.user.user_metadata?.user_name || auth.user.email}</h1>
-			<p>Manage your language preferences and development interests</p>
+			<p>Manage your technology stack and development interests</p>
 		</div>
 
 		<div class="section">
-			<h3>Your Languages</h3>
-			<p class="section-description">Add programming languages you're familiar with or interested in learning</p>
+			<h3>Your Technologies</h3>
+			<p class="section-description">Add technologies, frameworks, and languages you're familiar with or interested in learning</p>
 			
 			{#if languages.length > 0}
 				<div class="language-tags">
@@ -117,7 +132,7 @@
 				</div>
 			{:else}
 				<div class="empty-state">
-					<p>No languages added yet. Add some languages to personalize your experience!</p>
+					<p>No technologies added yet. Add some technologies to personalize your experience!</p>
 				</div>
 			{/if}
 
@@ -127,7 +142,7 @@
 						type="text"
 						bind:value={newLanguage}
 						onkeydown={handleKeydown}
-						placeholder="Enter a programming language..."
+						placeholder="Enter a technology (e.g. python, flask, sveltekit)..."
 						disabled={saving}
 					/>
 					<button 
@@ -140,6 +155,55 @@
 					</button>
 				</div>
 			</div>
+		</div>
+
+		<div class="section">
+			<h3>My List</h3>
+			<p class="section-description">Repositories you've saved for later</p>
+			
+			{#if savedRepos.savedRepos.length > 0}
+				<div class="saved-repos-grid">
+					{#each savedRepos.savedRepos.slice(0, displayLimit) as savedRepo}
+						<div class="saved-repo-wrapper">
+							<RepoCard repo={{
+								owner: savedRepo.repo_owner,
+								name: savedRepo.repo_name,
+								fullName: savedRepo.repo_full_name,
+								description: savedRepo.repo_description,
+								stars: savedRepo.repo_stars,
+								forks: 0,
+								language: savedRepo.repo_language,
+								openIssues: 0,
+								updatedAt: savedRepo.saved_at,
+								topics: []
+							}} />
+							<button 
+								class="unsave-button"
+								onclick={() => savedRepos.unsaveRepo(savedRepo.repo_owner, savedRepo.repo_name)}
+								title="Remove from saved"
+							>
+								<XIcon />
+							</button>
+						</div>
+					{/each}
+				</div>
+				
+				{#if savedRepos.savedRepos.length > displayLimit}
+					<div class="load-more-section">
+						<button 
+							class="button secondary"
+							onclick={loadMore}
+							disabled={loadingMore}
+						>
+							{loadingMore ? 'Loading...' : `Load More (${savedRepos.savedRepos.length - displayLimit} remaining)`}
+						</button>
+					</div>
+				{/if}
+			{:else}
+				<div class="empty-state">
+					<p>No saved repositories yet. Browse repositories and click "Add to My List" to save them here!</p>
+				</div>
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -289,5 +353,57 @@
 
 	.error {
 		color: #ef4444;
+	}
+
+	.saved-repos-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+		gap: 1.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.saved-repo-wrapper {
+		position: relative;
+	}
+
+	.unsave-button {
+		position: absolute;
+		top: 0.75rem;
+		right: 0.75rem;
+		background: var(--bg-1);
+		border: 1px solid var(--bg-3);
+		border-radius: 4px;
+		color: var(--txt-3);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.5rem;
+		transition: all 0.2s;
+		opacity: 0;
+	}
+
+	.saved-repo-wrapper:hover .unsave-button {
+		opacity: 1;
+	}
+
+	.unsave-button:hover {
+		background: var(--bg-2);
+		border-color: var(--acc-1);
+		color: var(--txt-1);
+	}
+
+	.unsave-button :global(.icon) {
+		font-size: 0.875rem;
+	}
+
+	.load-more-section {
+		display: flex;
+		justify-content: center;
+		margin-top: 1.5rem;
+	}
+
+	.load-more-section button {
+		min-width: 200px;
 	}
 </style>
