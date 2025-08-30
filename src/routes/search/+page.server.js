@@ -23,9 +23,8 @@ export async function load({ url, fetch }) {
 
 	try {
 		// Enhanced search query for beginner-friendly repos
-		const searchQuery = `${query} good-first-issues:>0 stars:>10`;
 		const response = await fetch(
-			`https://api.github.com/search/repositories?q=${encodeURIComponent(searchQuery)}&sort=stars&order=desc&per_page=20`,
+			`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=20`,
 			{ headers }
 		);
 
@@ -34,6 +33,11 @@ export async function load({ url, fetch }) {
 		}
 
 		const data = await response.json();
+
+		console.log(data);
+		console.log(
+			`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=20`
+		);
 
 		const results = data.items.map((repo) => ({
 			id: repo.id,
