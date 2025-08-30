@@ -1,6 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import SearchIcon from '~icons/ph/magnifying-glass';
+	import RepoCard from '$lib/components/RepoCard.svelte';
 
 	let searchInput = $state('');
 
@@ -27,11 +28,6 @@
 		}
 	}
 
-	// Handle suggestion clicks
-	function handleSuggestion(owner, repo) {
-		goto(`/repo/${owner}/${repo}`);
-	}
-
 	function generateContributionData() {
 		const cols = 24;
 		const rows = 7;
@@ -55,6 +51,58 @@
 	}
 
 	const contributionData = generateContributionData();
+
+	// Mock repo data for popular repositories
+	const popularRepos = [
+		{
+			owner: 'facebook',
+			name: 'react',
+			fullName: 'facebook/react',
+			description: 'The library for web and native user interfaces.',
+			stars: 225000,
+			forks: 45000,
+			language: 'JavaScript',
+			topics: [],
+			openIssues: 800,
+			updatedAt: '2025-08-29T10:30:00Z'
+		},
+		{
+			owner: 'microsoft',
+			name: 'vscode',
+			fullName: 'microsoft/vscode',
+			description: 'Visual Studio Code',
+			stars: 162000,
+			forks: 28500,
+			language: 'TypeScript',
+			topics: [],
+			openIssues: 5200,
+			updatedAt: '2025-08-30T08:15:00Z'
+		},
+		{
+			owner: 'nodejs',
+			name: 'node',
+			fullName: 'nodejs/node',
+			description: 'Node.js JavaScript runtime',
+			stars: 106000,
+			forks: 28800,
+			language: 'JavaScript',
+			topics: [],
+			openIssues: 1650,
+			updatedAt: '2025-08-29T16:45:00Z'
+		},
+		{
+			owner: 'vercel',
+			name: 'next.js',
+			fullName: 'vercel/next.js',
+			description: 'The React Framework for the Web',
+			stars: 124000,
+			forks: 26400,
+			language: 'JavaScript',
+			topics: [],
+			openIssues: 2100,
+			updatedAt: '2025-08-30T12:20:00Z'
+		}
+	];
 </script>
 
 <div class="content">
@@ -127,22 +175,9 @@
 	<div class="suggestions">
 		<h3>popular repositories</h3>
 		<div class="suggestion-grid">
-			<button onclick={() => handleSuggestion('facebook', 'react')}>
-				<span class="repo-name">facebook/react</span>
-				<span class="repo-desc">A declarative, efficient, and flexible JavaScript library</span>
-			</button>
-			<button onclick={() => handleSuggestion('microsoft', 'vscode')}>
-				<span class="repo-name">microsoft/vscode</span>
-				<span class="repo-desc">Visual Studio Code editor</span>
-			</button>
-			<button onclick={() => handleSuggestion('nodejs', 'node')}>
-				<span class="repo-name">nodejs/node</span>
-				<span class="repo-desc">Node.js JavaScript runtime</span>
-			</button>
-			<button onclick={() => handleSuggestion('vercel', 'next.js')}>
-				<span class="repo-name">vercel/next.js</span>
-				<span class="repo-desc">The React Framework for Production</span>
-			</button>
+			{#each popularRepos as repo}
+				<RepoCard {repo} />
+			{/each}
 		</div>
 	</div>
 </div>
@@ -269,5 +304,11 @@
 	.level-4 {
 		background: var(--acc-1);
 		opacity: 1;
+	}
+
+	.suggestion-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(25rem, 1fr));
+		gap: 1rem;
 	}
 </style>
