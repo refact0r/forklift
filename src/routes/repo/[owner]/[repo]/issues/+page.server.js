@@ -1,3 +1,5 @@
+import { GITHUB_TOKEN } from '$env/static/private';
+
 const BACKEND_URL = 'https://opensauce-ffw3451di-derek-yao-s-projects.vercel.app';
 
 export async function load({ params, fetch }) {
@@ -8,18 +10,12 @@ export async function load({ params, fetch }) {
 		'User-Agent': 'SvelteKit-Open-Source-Helper'
 	};
 
-	// Try to get GitHub token from environment, but don't fail if it's not available
-	let githubToken = null;
-	try {
-		const { GITHUB_TOKEN } = await import('$env/static/private');
-		githubToken = GITHUB_TOKEN;
-	} catch (error) {
-		console.log('⚠️ No GitHub token available, using public API limits');
-	}
-
 	// Add GitHub token if available
-	if (githubToken) {
-		headers.Authorization = `token ${githubToken}`;
+	if (GITHUB_TOKEN) {
+		headers.Authorization = `token ${GITHUB_TOKEN}`;
+		console.log('✅ Using GitHub token for API requests');
+	} else {
+		console.log('⚠️ No GitHub token available, using public API limits');
 	}
 
 	try {
