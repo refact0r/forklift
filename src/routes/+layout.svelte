@@ -37,27 +37,25 @@
 		<a href="/">home</a>
 		<a href="/search">search</a>
 	</div>
-	
+
 	<div class="nav-right">
 		{#if auth.loading}
-			<div class="loading-text">...</div>
+			<div class="loading-text">loading...</div>
 		{:else if auth.user}
 			<div class="user-info">
 				<a href="/profile" class="profile-link">
 					<UserIcon />
 					<span>{auth.user.user_metadata?.user_name || auth.user.email}</span>
 				</a>
-				<button class="sign-out-btn" onclick={handleSignOut}>
-					<SignOutIcon />
+				<button class="sign-out icon" onclick={handleSignOut}>
+					<SignOutIcon style="height: " />
 				</button>
 			</div>
 		{:else}
-			<button class="sign-in-btn" onclick={handleSignIn}>
-				Sign in with GitHub
-			</button>
+			<button class="sign-in" onclick={handleSignIn}>sign in with github </button>
 		{/if}
 	</div>
-	
+
 	{#if navigating.to}
 		<div class="loading-indicator">
 			<div class="loading-bar"></div>
@@ -75,7 +73,8 @@
 		font-size: 1.25rem;
 	}
 	header {
-		padding: 1rem 1rem;
+		padding: 0rem 1rem;
+		height: 4rem;
 		border-bottom: 1px solid var(--bg-3);
 		position: relative;
 		display: flex;
@@ -91,86 +90,47 @@
 			}
 		}
 	}
-	
+
 	.nav-left {
 		display: flex;
 		align-items: center;
 		gap: 2rem;
 	}
-	
+
 	.nav-right {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
 	}
-	
+
 	.user-info {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		color: var(--txt-2);
+		gap: 1rem;
 	}
-	
+
+	.sign-in,
+	.sign-out {
+	}
+
 	.profile-link {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
 		color: var(--txt-2);
 		text-decoration: none;
-		transition: color 0.2s;
-		
+
 		:global(.icon) {
 			color: var(--acc-1);
 		}
-		
-		span {
-			font-size: 0.875rem;
-		}
-		
+
 		&:hover {
 			color: var(--acc-1);
 		}
 	}
-	
-	.sign-in-btn {
-		background: var(--acc-1);
-		color: white;
-		border: none;
-		padding: 0.5rem 1rem;
-		border-radius: 4px;
-		cursor: pointer;
-		font-size: 0.875rem;
-		transition: background 0.2s;
-		
-		&:hover {
-			background: var(--acc-2);
-		}
-	}
-	
-	.sign-out-btn {
-		background: transparent;
-		border: 1px solid var(--bg-3);
-		color: var(--txt-2);
-		padding: 0.25rem;
-		border-radius: 4px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		transition: all 0.2s;
-		
-		&:hover {
-			background: var(--bg-2);
-			color: var(--acc-1);
-		}
-		
-		:global(.icon) {
-			font-size: 1rem;
-		}
-	}
-	
+
 	.loading-text {
 		color: var(--txt-3);
-		font-size: 0.875rem;
 	}
 	.heading {
 		width: fit-content;
