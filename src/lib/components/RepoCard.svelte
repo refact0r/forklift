@@ -125,10 +125,10 @@
 		flex-wrap: wrap;
 	}
 
-	.repo-meta.small .repo-details {
+	/* .repo-meta.small .repo-details {
 		width: 100%;
 		justify-content: space-between;
-	}
+	} */
 
 	.language {
 		color: var(--acc-1);

@@ -1,12 +1,13 @@
 import { GITHUB_TOKEN } from '$env/static/private';
 
-export async function load({ params, fetch, setHeaders }) {
-	// cache for 1 hour
-	setHeaders({
-		'cache-control': 'max-age=3600'
-	});
+export async function load({ fetch, parent }) {
+	// Get basic repo data from parent layout
+	const { repoData: basicRepoData, owner, repo, error } = await parent();
 
-	const { owner, repo } = params;
+	// If there was an error getting basic repo data, pass it through
+	if (error) {
+		return { owner, repo, error, repoData: basicRepoData };
+	}
 
 	const baseHeaders = {
 		Accept: 'application/vnd.github.v3+json'
@@ -28,28 +29,13 @@ export async function load({ params, fetch, setHeaders }) {
 	}
 
 	try {
-		// Fetch main repository data (this is required)
-		const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-			headers: baseHeaders
-		});
-
-		if (!repoResponse.ok) {
-			throw new Error(
-				repoResponse.status === 404
-					? 'Repository not found'
-					: `GitHub API error: ${repoResponse.status}`
-			);
-		}
-
-		const repoData = await repoResponse.json();
-
-		// Fetch all data in parallel (these are optional)
+		// Fetch detailed data needed for AI processing (these are optional)
 		const [readmeData, contributingData, languagesData, treeData] = await Promise.all([
 			safeFetch(`https://api.github.com/repos/${owner}/${repo}/readme`),
 			safeFetch(`https://api.github.com/repos/${owner}/${repo}/contents/CONTRIBUTING.md`),
 			safeFetch(`https://api.github.com/repos/${owner}/${repo}/languages`),
 			safeFetch(
-				`https://api.github.com/repos/${owner}/${repo}/git/trees/${repoData.default_branch}?recursive=1`
+				`https://api.github.com/repos/${owner}/${repo}/git/trees/${basicRepoData.default_branch || 'main'}?recursive=1`
 			)
 		]);
 
@@ -101,14 +87,8 @@ export async function load({ params, fetch, setHeaders }) {
 
 		// Prepare repo data for AI processing
 		const repoDataForAI = {
-			// Basic metadata
-			name: repoData.name,
-			full_name: repoData.full_name,
-			description: repoData.description || 'No description available',
-			stars: repoData.stargazers_count || 0,
-			forks: repoData.forks_count || 0,
-			language: repoData.language || 'Unknown',
-			topics: repoData.topics || [],
+			// Basic metadata from layout
+			...basicRepoData,
 
 			// Content for LLM processing
 			readme: readmeContent,
@@ -144,47 +124,23 @@ export async function load({ params, fetch, setHeaders }) {
 		return {
 			owner,
 			repo,
-			repoData: {
-				// Basic metadata
-				name: repoData.name,
-				full_name: repoData.full_name,
-				description: repoData.description || 'No description available',
-				stars: repoData.stargazers_count || 0,
-				forks: repoData.forks_count || 0,
-				language: repoData.language || 'Unknown',
-				topics: repoData.topics || [],
-
-				// Content for LLM processing
-				readme: readmeContent,
-				contributing: contributingContent,
-
-				// Tech stack data
-				languages: languages,
-				fileExtensions: fileExtensions,
-				packageFiles: packageFiles
-			},
+			repoData: repoDataForAI,
 			overview: overview
 		};
 	} catch (error) {
-		console.error('Failed to fetch GitHub repository data:', error);
+		console.error('Failed to fetch detailed GitHub repository data:', error);
 		return {
 			owner,
 			repo,
-			error: error.message,
 			repoData: {
-				name: `${owner}/${repo}`,
-				full_name: `${owner}/${repo}`,
-				description: 'Could not load repository data',
-				stars: 0,
-				forks: 0,
-				language: 'Unknown',
-				topics: [],
+				...basicRepoData,
 				readme: null,
 				contributing: null,
 				languages: [],
 				fileExtensions: [],
 				packageFiles: {}
-			}
+			},
+			overview: null
 		};
 	}
 }

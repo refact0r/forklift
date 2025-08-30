@@ -29,8 +29,8 @@ export async function POST({ request, setHeaders }) {
 		const prompt = `You are a repository onboarding assistant that helps newcomers understand GitHub repositories. Generate 3 sections based on the repository data below. 
 
 1. quick_context: Human-readable summary (what/who/why the project exists).
-2. project_landscape: A concise, comma separated list of technologies, languages, and skills needed.
-3. onboarding_essentials: Distilled prerequisites and setup instructions in MARKDOWN format. There should be no h1.
+2. project_landscape: Two concise, comma separated list of languages and frameworks/tools needed.
+3. onboarding_essentials: Distilled prerequisites and setup instructions in MARKDOWN format. There should be no h1 or starting text.
 
 RETURN STRICT JSON: {
   "quick_context": {

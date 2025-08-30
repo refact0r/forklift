@@ -36,8 +36,9 @@ a {
 }
 
 a.button {
-	padding: 0.5rem;
+	padding: 0.5rem 0.75rem;
 	background: var(--bg-2);
+	border: 1px solid var(--bg-3);
 
 	&:hover {
 		background: var(--bg-3);
