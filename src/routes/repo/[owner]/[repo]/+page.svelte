@@ -1,110 +1,280 @@
 <script>
 	let { data } = $props();
 
-	// Use real data from the load function
-	let repoData = $state(data.repoData);
-	let error = $state(data.error);
+	console.log(data);
 
-	function goToIssues() {
-		goto(`/repo/${data.owner}/${data.repo}/issues`);
-	}
-
-	function goBack() {
-		goto('/');
-	}
-
-	// Format the README content for better display
-	function formatReadme(content) {
-		if (!content || content === 'No README available') {
-			return content;
-		}
-		// Basic markdown-like formatting - just handle line breaks for now
-		return content.replace(/\n/g, '\n');
-	}
-
-	// Format tech stack for display
-	function formatTechStack(languages) {
-		if (!languages || languages.length === 0) {
-			return ['No languages detected'];
-		}
-		return languages;
-	}
+	// Extract data for easier access
+	const { owner, repo, repoData, overview, error } = data;
+	const hasOverview = overview && !error;
 </script>
 
 <div class="content">
-	<div class="header">
-		<a class="button" href="/" onclick={goBack}>back</a>
-		<h1>{data.owner}/{data.repo}</h1>
-		{#if repoData.url}
-			<a href={repoData.url} target="_blank" rel="noopener noreferrer" class="github-link">
-				View on GitHub →
-			</a>
-		{/if}
-	</div>
-
 	{#if error}
-		<div class="error-message">
-			<h2>Error Loading Repository</h2>
-			<p>{error}</p>
-			<p>Please check that the repository exists and is public.</p>
+		<div class="error-section">
+			<h1>Repository Not Found</h1>
+			<p>Could not load {owner}/{repo}: {error}</p>
 		</div>
 	{:else}
-		<div class="repo-info">
-			<div class="stats">
-				<span class="stat">⭐ {repoData.stars.toLocaleString()}</span>
-				<span class="stat">🍴 {repoData.forks.toLocaleString()}</span>
-				<span class="stat">💻 {repoData.language}</span>
+		<!-- Repository Header -->
+		<header class="repo-header">
+			<h1>{repoData.full_name}</h1>
+			<p class="repo-description">{repoData.description}</p>
+			<div class="repo-stats">
+				<span class="stat">⭐ {repoData.stars}</span>
+				<span class="stat">🔀 {repoData.forks}</span>
+				<span class="stat">📝 {repoData.language}</span>
 			</div>
-
-			<p class="description">{repoData.description}</p>
-
-			{#if repoData.topics && repoData.topics.length > 0}
+			{#if repoData.topics?.length > 0}
 				<div class="topics">
 					{#each repoData.topics as topic}
 						<span class="topic">{topic}</span>
 					{/each}
 				</div>
 			{/if}
-		</div>
+		</header>
 
-		<div class="content-grid">
-			<div class="section">
-				<h2>README Preview</h2>
-				<div class="content-box">
-					<pre class="readme-content">{formatReadme(repoData.readme)}</pre>
-					{#if repoData.readme.length >= 1000}
-						<p class="truncated-note">... (truncated, view full README on GitHub)</p>
+		{#if hasOverview}
+			<!-- Section 1: Quick Context -->
+			<section class="overview-section">
+				<h2>Quick Context</h2>
+				<div class="context-grid">
+					<div class="context-item">
+						<h3>What</h3>
+						<p>{overview.quick_context.what}</p>
+					</div>
+					<div class="context-item">
+						<h3>Who</h3>
+						<p>{overview.quick_context.who}</p>
+					</div>
+					<div class="context-item">
+						<h3>Why</h3>
+						<p>{overview.quick_context.why}</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Section 2: Project Landscape -->
+			<section class="overview-section">
+				<h2>Project Landscape</h2>
+				<div class="landscape-content">
+					{#if overview.project_landscape.languages?.length > 0}
+						<div class="tech-group">
+							<h4>Languages</h4>
+							<div class="tech-tags">
+								{#each overview.project_landscape.languages as lang}
+									<span class="tech-tag">{lang}</span>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					{#if overview.project_landscape.tools?.length > 0}
+						<div class="tech-group">
+							<h4>Tools & Frameworks</h4>
+							<div class="tech-tags">
+								{#each overview.project_landscape.tools as tool}
+									<span class="tech-tag">{tool}</span>
+								{/each}
+							</div>
+						</div>
 					{/if}
 				</div>
-			</div>
+			</section>
 
-			<div class="section">
-				<h2>Languages & Tech Stack</h2>
-				<div class="content-box">
-					<ul>
-						{#each formatTechStack(repoData.techStack) as tech}
-							<li>{tech}</li>
-						{/each}
-					</ul>
+			<!-- Section 3: Onboarding Essentials -->
+			<section class="overview-section">
+				<h2>Onboarding Essentials</h2>
+				<div class="onboarding-content">
+					{@html overview.onboarding_essentials}
 				</div>
-			</div>
+			</section>
+		{:else}
+			<!-- Fallback: Show basic repo info without AI overview -->
+			<section class="overview-section">
+				<h2>Repository Information</h2>
+				<p>AI overview not available. Here's what we found:</p>
 
-			<div class="section">
-				<h2>File Structure Overview</h2>
-				<div class="content-box">
-					<pre class="file-structure">{repoData.fileStructure}</pre>
-					{#if repoData.fileStructure.split('\n').length >= 50}
-						<p class="truncated-note">... (showing first 50 files)</p>
-					{/if}
-				</div>
-			</div>
-		</div>
+				{#if repoData.languages?.length > 0}
+					<div class="tech-group">
+						<h4>Languages</h4>
+						<div class="tech-tags">
+							{#each repoData.languages as lang}
+								<span class="tech-tag">{lang}</span>
+							{/each}
+						</div>
+					</div>
+				{/if}
 
-		<div class="actions">
-			<button class="primary-btn" onclick={goToIssues}>View Open Issues</button>
-		</div>
+				{#if repoData.readme}
+					<div class="readme-section">
+						<h4>README Preview</h4>
+						<pre class="readme-preview">{repoData.readme.slice(0, 500)}...</pre>
+					</div>
+				{/if}
+			</section>
+		{/if}
+
+		<!-- Actions -->
+		<section class="actions-section">
+			<a href="https://github.com/{owner}/{repo}" target="_blank" class="button accent">
+				View on GitHub
+			</a>
+			<a href="/repo/{owner}/{repo}/issues" class="button"> Browse Issues </a>
+		</section>
 	{/if}
 </div>
 
 <style>
+	.error-section {
+		text-align: center;
+		padding: 2rem;
+	}
+
+	.repo-header {
+		border-bottom: 1px solid var(--bg-3);
+		padding-bottom: 1.5rem;
+		margin-bottom: 2rem;
+	}
+
+	.repo-header h1 {
+		margin: 0 0 0.5rem 0;
+		font-size: 2rem;
+	}
+
+	.repo-description {
+		color: var(--txt-1);
+		font-size: 1.1rem;
+		margin: 0 0 1rem 0;
+	}
+
+	.repo-stats {
+		display: flex;
+		gap: 1.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.stat {
+		color: var(--txt-2);
+		font-size: 0.9rem;
+	}
+
+	.topics {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.topic {
+		background: var(--bg-2);
+		border: 1px solid var(--bg-3);
+		padding: 0.25rem 0.5rem;
+		font-size: 0.8rem;
+		color: var(--txt-2);
+	}
+
+	.overview-section {
+		margin-bottom: 2.5rem;
+	}
+
+	.overview-section h2 {
+		margin: 0 0 1rem 0;
+		font-size: 1.5rem;
+		color: var(--acc-1);
+	}
+
+	.context-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 1.5rem;
+	}
+
+	.context-item h3 {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.1rem;
+		color: var(--txt-0);
+	}
+
+	.context-item p {
+		margin: 0;
+		color: var(--txt-1);
+		line-height: 1.4;
+	}
+
+	.landscape-content {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.tech-group h4 {
+		margin: 0 0 0.75rem 0;
+		font-size: 1rem;
+		color: var(--txt-0);
+	}
+
+	.tech-tags {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.tech-tag {
+		background: var(--bg-2);
+		border: 1px solid var(--bg-3);
+		padding: 0.4rem 0.8rem;
+		font-size: 0.9rem;
+		color: var(--txt-1);
+	}
+
+	.onboarding-content {
+		background: var(--bg-2);
+		border: 1px solid var(--bg-3);
+		padding: 1.5rem;
+	}
+
+	.onboarding-content :global(h1),
+	.onboarding-content :global(h2),
+	.onboarding-content :global(h3) {
+		margin-top: 0;
+		color: var(--txt-0);
+	}
+
+	.onboarding-content :global(code) {
+		background: var(--bg-3);
+		padding: 0.2rem 0.4rem;
+		font-family: 'DM Mono', monospace;
+	}
+
+	.onboarding-content :global(pre) {
+		background: var(--bg-3);
+		padding: 1rem;
+		overflow-x: auto;
+	}
+
+	.readme-section {
+		margin-top: 1.5rem;
+	}
+
+	.readme-section h4 {
+		margin: 0 0 0.75rem 0;
+		color: var(--txt-0);
+	}
+
+	.readme-preview {
+		background: var(--bg-2);
+		border: 1px solid var(--bg-3);
+		padding: 1rem;
+		font-size: 0.85rem;
+		color: var(--txt-2);
+		white-space: pre-wrap;
+		overflow: hidden;
+	}
+
+	.actions-section {
+		display: flex;
+		gap: 1rem;
+		margin-top: 2rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--bg-3);
+	}
 </style>

@@ -27,5 +27,8 @@
 		"svelte": "^5.0.0",
 		"unplugin-icons": "^22.2.0",
 		"vite": "^7.0.4"
+	},
+	"dependencies": {
+		"openai": "^5.16.0"
 	}
 }
