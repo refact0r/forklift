@@ -6,7 +6,11 @@ const openai = new OpenAI({
 	apiKey: OPENAI_API_KEY
 });
 
-export async function POST({ request }) {
+export async function POST({ request, setHeaders }) {
+	setHeaders({
+		'cache-control': 'max-age=3600'
+	});
+
 	let repoData;
 
 	try {
@@ -26,7 +30,7 @@ export async function POST({ request }) {
 
 1. quick_context: Human-readable summary (what/who/why the project exists).
 2. project_landscape: A concise, comma separated list of technologies, languages, and skills needed.
-3. onboarding_essentials: Distilled prerequisites and setup instructions
+3. onboarding_essentials: Distilled prerequisites and setup instructions in MARKDOWN format. There should be no h1.
 
 RETURN STRICT JSON: {
   "quick_context": {
@@ -38,7 +42,7 @@ RETURN STRICT JSON: {
     "languages": ["JavaScript", "TypeScript", etc.],
     "tools": ["React", "Next.js", "Tailwind", etc.],
   },
-  "onboarding_essentials": "Instructions in Markdown format"
+  "onboarding_essentials": "Setup instructions in MARKDOWN format"
 }
 
 REPOSITORY DATA:
@@ -92,7 +96,17 @@ ${packageInfo || 'No package files found'}`;
 				who: '',
 				why: ''
 			},
-			onboarding_essentials: 'Please check the repository README for setup instructions.'
+			onboarding_essentials: `## Getting Started
+
+Please check the repository README for setup instructions.
+
+### Prerequisites
+- Git
+- Basic programming knowledge
+
+### Setup
+1. Clone the repository
+2. Follow the README instructions`
 		};
 
 		return json(

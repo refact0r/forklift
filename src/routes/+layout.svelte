@@ -2,9 +2,26 @@
 	import '../app.css';
 	import { goto } from '$app/navigation';
 	import { navigating } from '$app/state';
+	import { onMount } from 'svelte';
 	import GitIcon from '~icons/ph/git-fork';
+	import UserIcon from '~icons/ph/user';
+	import SignOutIcon from '~icons/ph/sign-out';
+	import UserCircleIcon from '~icons/ph/user-circle';
+	import { auth } from '$lib/auth.svelte.js';
 
 	let { children } = $props();
+
+	onMount(() => {
+		auth.initialize();
+	});
+
+	async function handleSignIn() {
+		await auth.signInWithGitHub();
+	}
+
+	async function handleSignOut() {
+		await auth.signOut();
+	}
 </script>
 
 <svelte:head>
@@ -12,12 +29,33 @@
 </svelte:head>
 
 <header>
-	<a class="heading" href="/">
-		<GitIcon />
-		<h1>forklift</h1>
-	</a>
-	<a href="/">home</a>
-	<a href="/search">search</a>
+	<div class="nav-left">
+		<a class="heading" href="/">
+			<GitIcon />
+			<h1>forklift</h1>
+		</a>
+		<a href="/">home</a>
+		<a href="/search">search</a>
+	</div>
+
+	<div class="nav-right">
+		{#if auth.loading}
+			<div class="loading-text">loading...</div>
+		{:else if auth.user}
+			<div class="user-info">
+				<a href="/profile" class="profile-link">
+					<UserIcon />
+					<span>{auth.user.user_metadata?.user_name || auth.user.email}</span>
+				</a>
+				<button class="sign-out icon" onclick={handleSignOut}>
+					<SignOutIcon style="height: " />
+				</button>
+			</div>
+		{:else}
+			<button class="sign-in" onclick={handleSignIn}>sign in with github </button>
+		{/if}
+	</div>
+
 	{#if navigating.to}
 		<div class="loading-indicator">
 			<div class="loading-bar"></div>
@@ -35,11 +73,13 @@
 		font-size: 1.25rem;
 	}
 	header {
-		padding: 1rem 1rem;
+		padding: 0rem 1rem;
+		height: 4rem;
 		border-bottom: 1px solid var(--bg-3);
 		position: relative;
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: 2rem;
 
 		a {
@@ -49,6 +89,48 @@
 				color: var(--acc-1);
 			}
 		}
+	}
+
+	.nav-left {
+		display: flex;
+		align-items: center;
+		gap: 2rem;
+	}
+
+	.nav-right {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.user-info {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.sign-in,
+	.sign-out {
+	}
+
+	.profile-link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--txt-2);
+		text-decoration: none;
+
+		:global(.icon) {
+			color: var(--acc-1);
+		}
+
+		&:hover {
+			color: var(--acc-1);
+		}
+	}
+
+	.loading-text {
+		color: var(--txt-3);
 	}
 	.heading {
 		width: fit-content;
