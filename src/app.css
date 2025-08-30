@@ -9,6 +9,7 @@
 	--bg-2: hsl(60, 10%, 11%);
 	--bg-1: hsl(60, 10%, 6%);
 	--acc-1: hsl(60, 60%, 60%);
+	--acc-2: hsl(60, 60%, 45%);
 	font-family: 'DM Mono', monospace;
 	font-weight: 300;
 }
@@ -51,6 +52,10 @@ h4 {
 	font-weight: 300;
 }
 
+p {
+	line-height: 1.5;
+}
+
 button {
 	font: inherit;
 	border: none;
@@ -62,6 +67,16 @@ button {
 
 	&:hover {
 		background: var(--bg-3);
+	}
+
+	&.accent {
+		background: var(--acc-1);
+		color: var(--bg-1);
+		border: 1px solid var(--acc-1);
+
+		&:hover {
+			background: var(--acc-2);
+		}
 	}
 }
 
@@ -79,4 +94,31 @@ input::placeholder {
 
 .icon {
 	color: inherit;
+}
+
+.content {
+	padding: 2rem;
+	margin: 2rem auto;
+	max-width: 64rem;
+}
+
+.search-container {
+	position: relative;
+	display: flex;
+	gap: 1rem;
+	width: 100%;
+}
+
+.searchbar {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	width: 100%;
+	padding: 0.75rem;
+	background: var(--bg-2);
+	border: 1px solid var(--bg-3);
+
+	&:focus-within {
+		border-color: var(--acc-1);
+	}
 }

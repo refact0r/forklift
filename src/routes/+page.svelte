@@ -1,22 +1,33 @@
 <script>
 	import { goto } from '$app/navigation';
-
 	import SearchIcon from '~icons/ph/magnifying-glass';
 
-	let repoUrl = '';
+	let searchInput = $state('');
 
+	function detectSearchType(input) {
+		const githubUrlPattern = /github\.com\/([^\/]+)\/([^\/]+)/;
+		return githubUrlPattern.test(input) ? 'direct' : 'search';
+	}
+
+	// Handle search submission
 	function handleSearch() {
-		if (repoUrl.trim()) {
-			const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+		const input = searchInput.trim();
+		if (!input) return;
+
+		const searchType = detectSearchType(input);
+
+		if (searchType === 'direct') {
+			const match = input.match(/github\.com\/([^\/]+)\/([^\/]+)/);
 			if (match) {
 				const [, owner, repo] = match;
 				goto(`/repo/${owner}/${repo}`);
-			} else {
-				alert('Please enter a valid GitHub repository URL');
 			}
+		} else {
+			goto(`/search?q=${encodeURIComponent(input)}`);
 		}
 	}
 
+	// Handle suggestion clicks
 	function handleSuggestion(owner, repo) {
 		goto(`/repo/${owner}/${repo}`);
 	}
@@ -47,69 +58,91 @@
 </script>
 
 <div class="content">
-	<div class="container">
-		<div class="hero">
-			<div class="left">
-				<h1>your shortcut to <span>open source</span></h1>
-				<p>find repositories, understand codebases, discover issues, and start contributing.</p>
-			</div>
-			<div class="right">
-				<div class="graph-container">
-					<div class="month-labels">
-						<span style="grid-column: 1 / 6;">Sep</span>
-						<span style="grid-column: 6 / 10;">Nov</span>
-						<span style="grid-column: 11 / 16;">Dec</span>
-						<span style="grid-column: 16 / 21;">Jan</span>
-						<span style="grid-column: 21 / 25;">Feb</span>
+	<div class="hero">
+		<div class="left">
+			<h1>your shortcut to <span>open source</span></h1>
+			<p>find repositories, understand codebases, discover issues, and start contributing.</p>
+		</div>
+		<div class="right">
+			<div class="graph-container">
+				<div class="month-labels">
+					<span style="grid-column: 1 / 6;">Sep</span>
+					<span style="grid-column: 6 / 10;">Nov</span>
+					<span style="grid-column: 11 / 16;">Dec</span>
+					<span style="grid-column: 16 / 21;">Jan</span>
+					<span style="grid-column: 21 / 25;">Feb</span>
+				</div>
+
+				<div class="graph-with-days">
+					<div class="day-labels">
+						<span></span>
+						<span>Mon</span>
+						<span></span>
+						<span>Wed</span>
+						<span></span>
+						<span>Fri</span>
+						<span></span>
 					</div>
 
-					<div class="graph-with-days">
-						<div class="day-labels">
-							<span></span>
-							<span>Mon</span>
-							<span></span>
-							<span>Wed</span>
-							<span></span>
-							<span>Fri</span>
-							<span></span>
-						</div>
-
-						<div class="graph-grid">
-							{#each contributionData as week}
-								<div class="week">
-									{#each week as day}
-										<div class="day level-{day}" title="Contributions"></div>
-									{/each}
-								</div>
-							{/each}
-						</div>
+					<div class="graph-grid">
+						{#each contributionData as week}
+							<div class="week">
+								{#each week as day}
+									<div class="day level-{day}" title="Contributions"></div>
+								{/each}
+							</div>
+						{/each}
 					</div>
+				</div>
 
-					<div class="graph-legend">
-						<span>less</span>
-						<div class="legend-squares">
-							<div class="legend-square level-0"></div>
-							<div class="legend-square level-1"></div>
-							<div class="legend-square level-2"></div>
-							<div class="legend-square level-3"></div>
-							<div class="legend-square level-4"></div>
-						</div>
-						<span>more</span>
+				<div class="graph-legend">
+					<span>less</span>
+					<div class="legend-squares">
+						<div class="legend-square level-0"></div>
+						<div class="legend-square level-1"></div>
+						<div class="legend-square level-2"></div>
+						<div class="legend-square level-3"></div>
+						<div class="legend-square level-4"></div>
 					</div>
+					<span>more</span>
 				</div>
 			</div>
 		</div>
-		<div class="search">
-			<div class="searchbar">
-				<SearchIcon />
-				<input
-					type="text"
-					bind:value={repoUrl}
-					placeholder="enter github repository url"
-					onkeydown={(e) => e.key === 'Enter' && handleSearch()}
-				/>
-			</div>
-			<button onclick={handleSearch}>start</button>
+	</div>
+	<div class="search-container">
+		<div class="searchbar">
+			<SearchIcon />
+			<input
+				type="text"
+				bind:value={searchInput}
+				onkeydown={(e) => e.key === 'Enter' && handleSearch()}
+				placeholder="enter github url or search repositories..."
+			/>
+		</div>
+		<button onclick={handleSearch} class="accent">
+			{detectSearchType(searchInput) === 'direct' ? 'analyze' : 'search'}
+		</button>
+	</div>
+
+	<div class="suggestions">
+		<h3>popular repositories</h3>
+		<div class="suggestion-grid">
+			<button onclick={() => handleSuggestion('facebook', 'react')}>
+				<span class="repo-name">facebook/react</span>
+				<span class="repo-desc">A declarative, efficient, and flexible JavaScript library</span>
+			</button>
+			<button onclick={() => handleSuggestion('microsoft', 'vscode')}>
+				<span class="repo-name">microsoft/vscode</span>
+				<span class="repo-desc">Visual Studio Code editor</span>
+			</button>
+			<button onclick={() => handleSuggestion('nodejs', 'node')}>
+				<span class="repo-name">nodejs/node</span>
+				<span class="repo-desc">Node.js JavaScript runtime</span>
+			</button>
+			<button onclick={() => handleSuggestion('vercel', 'next.js')}>
+				<span class="repo-name">vercel/next.js</span>
+				<span class="repo-desc">The React Framework for Production</span>
+			</button>
 		</div>
 	</div>
 </div>
@@ -125,20 +158,6 @@
 		}
 	}
 
-	.content {
-		padding: 2rem;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.container {
-		display: flex;
-		flex-direction: column;
-		max-width: 60rem;
-	}
-
 	.hero {
 		margin: 2rem 0;
 		display: flex;
@@ -149,24 +168,8 @@
 		margin-bottom: 1rem;
 	}
 
-	.search {
-		display: flex;
-		gap: 1rem;
-		width: 100%;
-	}
-
-	.searchbar {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		width: 100%;
-		padding: 0.75rem;
-		background: var(--bg-2);
-		border: 1px solid var(--bg-3);
-
-		&:focus-within {
-			border-color: var(--acc-1);
-		}
+	.search-container {
+		margin-bottom: 3rem;
 	}
 
 	.graph-container {
