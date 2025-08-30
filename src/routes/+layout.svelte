@@ -6,6 +6,7 @@
 	import GitIcon from '~icons/ph/git-fork';
 	import UserIcon from '~icons/ph/user';
 	import SignOutIcon from '~icons/ph/sign-out';
+	import UserCircleIcon from '~icons/ph/user-circle';
 	import { auth } from '$lib/auth.svelte.js';
 
 	let { children } = $props();
@@ -42,8 +43,10 @@
 			<div class="loading-text">...</div>
 		{:else if auth.user}
 			<div class="user-info">
-				<UserIcon />
-				<span>{auth.user.user_metadata?.user_name || auth.user.email}</span>
+				<a href="/profile" class="profile-link">
+					<UserIcon />
+					<span>{auth.user.user_metadata?.user_name || auth.user.email}</span>
+				</a>
 				<button class="sign-out-btn" onclick={handleSignOut}>
 					<SignOutIcon />
 				</button>
@@ -106,6 +109,15 @@
 		align-items: center;
 		gap: 0.5rem;
 		color: var(--txt-2);
+	}
+	
+	.profile-link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--txt-2);
+		text-decoration: none;
+		transition: color 0.2s;
 		
 		:global(.icon) {
 			color: var(--acc-1);
@@ -113,6 +125,10 @@
 		
 		span {
 			font-size: 0.875rem;
+		}
+		
+		&:hover {
+			color: var(--acc-1);
 		}
 	}
 	
