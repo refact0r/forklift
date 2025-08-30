@@ -3,6 +3,7 @@ import { auth } from './auth.svelte.js';
 
 class SavedReposManager {
 	savedRepos = $state([]);
+	userSkills = $state([]);
 	isLoading = $state(false);
 
 	async loadSavedRepos() {
@@ -28,6 +29,29 @@ class SavedReposManager {
 			console.error('Error loading saved repos:', error);
 		} finally {
 			this.isLoading = false;
+		}
+	}
+
+	async loadUserSkills() {
+		if (!auth.user) {
+			this.userSkills = [];
+			return;
+		}
+
+		try {
+			const { data, error } = await supabase
+				.from('user_languages')
+				.select('language')
+				.eq('user_id', auth.user.id)
+				.order('created_at');
+
+			if (error) {
+				console.error('Error loading user skills:', error);
+			} else {
+				this.userSkills = data?.map(item => item.language) || [];
+			}
+		} catch (error) {
+			console.error('Error loading user skills:', error);
 		}
 	}
 

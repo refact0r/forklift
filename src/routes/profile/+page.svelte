@@ -24,6 +24,7 @@
 		
 		await loadLanguages();
 		await savedRepos.loadSavedRepos();
+		await savedRepos.loadUserSkills();
 		loading = false;
 	});
 
@@ -60,6 +61,8 @@
 		} else {
 			languages = [...languages, language];
 			newLanguage = '';
+			// Update skills in savedRepos manager too
+			await savedRepos.loadUserSkills();
 		}
 		saving = false;
 	}
@@ -78,6 +81,8 @@
 			console.error('Error removing language:', error);
 		} else {
 			languages = languages.filter(lang => lang !== languageToRemove);
+			// Update skills in savedRepos manager too
+			await savedRepos.loadUserSkills();
 		}
 		saving = false;
 	}
@@ -107,12 +112,12 @@
 	{:else}
 		<div class="profile-header">
 			<h1>{auth.user.user_metadata?.user_name || auth.user.email}</h1>
-			<p>Manage your technology stack and development interests</p>
+			<p>Manage your skills and development interests</p>
 		</div>
 
 		<div class="section">
-			<h3>Your Technologies</h3>
-			<p class="section-description">Add technologies, frameworks, and languages you're familiar with or interested in learning</p>
+			<h3>Your Skills</h3>
+			<p class="section-description">Add programming languages, frameworks, and tools you're familiar with or interested in learning</p>
 			
 			{#if languages.length > 0}
 				<div class="language-tags">
@@ -132,7 +137,7 @@
 				</div>
 			{:else}
 				<div class="empty-state">
-					<p>No technologies added yet. Add some technologies to personalize your experience!</p>
+					<p>No skills added yet. Add some skills to personalize your experience!</p>
 				</div>
 			{/if}
 
@@ -142,7 +147,7 @@
 						type="text"
 						bind:value={newLanguage}
 						onkeydown={handleKeydown}
-						placeholder="Enter a technology (e.g. python, flask, sveltekit)..."
+						placeholder="Enter a skill (e.g. python, flask, sveltekit)..."
 						disabled={saving}
 					/>
 					<button 

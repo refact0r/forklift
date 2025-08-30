@@ -16,6 +16,7 @@
 	onMount(async () => {
 		if (auth.user) {
 			await savedRepos.loadSavedRepos();
+			await savedRepos.loadUserSkills();
 		}
 	});
 
