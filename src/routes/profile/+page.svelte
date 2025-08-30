@@ -7,6 +7,7 @@
 	import { supabase } from '$lib/supabase.js';
 	import { savedRepos } from '$lib/savedRepos.svelte.js';
 	import RepoCard from '$lib/components/RepoCard.svelte';
+	import { COMMON_SKILLS } from '$lib/commonSkills.js';
 
 	let languages = $state([]);
 	let newLanguage = $state('');
@@ -14,6 +15,9 @@
 	let saving = $state(false);
 	let displayLimit = $state(10);
 	let loadingMore = $state(false);
+	let showSuggestions = $state(false);
+	let filteredSuggestions = $state([]);
+	let selectedSuggestionIndex = $state(-1);
 
 	onMount(async () => {
 		// Redirect if not authenticated
@@ -26,6 +30,13 @@
 		await savedRepos.loadSavedRepos();
 		await savedRepos.loadUserSkills();
 		loading = false;
+
+		// Add click outside listener
+		document.addEventListener('click', handleClickOutside);
+		
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
 	});
 
 	async function loadLanguages() {
@@ -87,9 +98,67 @@
 		saving = false;
 	}
 
+	function handleInput() {
+		const query = newLanguage.trim();
+		
+		if (query.length === 0) {
+			showSuggestions = false;
+			filteredSuggestions = [];
+			return;
+		}
+
+		// Filter suggestions based on input
+		const suggestions = COMMON_SKILLS
+			.filter(skill => 
+				skill.toLowerCase().includes(query.toLowerCase()) && 
+				!languages.includes(skill)
+			)
+			.slice(0, 8); // Show max 8 suggestions
+
+		filteredSuggestions = suggestions;
+		showSuggestions = suggestions.length > 0;
+		selectedSuggestionIndex = -1;
+	}
+
 	function handleKeydown(event) {
-		if (event.key === 'Enter') {
-			addLanguage();
+		if (!showSuggestions) {
+			if (event.key === 'Enter') {
+				addLanguage();
+			}
+			return;
+		}
+
+		// Handle suggestion navigation
+		if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, filteredSuggestions.length - 1);
+		} else if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+		} else if (event.key === 'Enter') {
+			event.preventDefault();
+			if (selectedSuggestionIndex >= 0) {
+				selectSuggestion(filteredSuggestions[selectedSuggestionIndex]);
+			} else {
+				addLanguage();
+			}
+		} else if (event.key === 'Escape') {
+			showSuggestions = false;
+			selectedSuggestionIndex = -1;
+		}
+	}
+
+	function selectSuggestion(skill) {
+		newLanguage = skill;
+		showSuggestions = false;
+		selectedSuggestionIndex = -1;
+		addLanguage();
+	}
+
+	function handleClickOutside(event) {
+		if (!event.target.closest('.add-language')) {
+			showSuggestions = false;
+			selectedSuggestionIndex = -1;
 		}
 	}
 
@@ -143,13 +212,30 @@
 
 			<div class="add-language">
 				<div class="input-group">
-					<input
-						type="text"
-						bind:value={newLanguage}
-						onkeydown={handleKeydown}
-						placeholder="Enter a skill (e.g. python, flask, sveltekit)..."
-						disabled={saving}
-					/>
+					<div class="input-wrapper">
+						<input
+							type="text"
+							bind:value={newLanguage}
+							onkeydown={handleKeydown}
+							oninput={handleInput}
+							placeholder="Enter a skill (e.g. python, flask, sveltekit)..."
+							disabled={saving}
+							autocomplete="off"
+						/>
+						{#if showSuggestions && filteredSuggestions.length > 0}
+							<div class="suggestions-dropdown">
+								{#each filteredSuggestions as suggestion, index}
+									<button
+										class="suggestion-item"
+										class:selected={index === selectedSuggestionIndex}
+										onclick={() => selectSuggestion(suggestion)}
+									>
+										{suggestion}
+									</button>
+								{/each}
+							</div>
+						{/if}
+					</div>
 					<button 
 						class="add-btn accent" 
 						onclick={addLanguage}
@@ -313,7 +399,7 @@
 	}
 
 	.add-language {
-		max-width: 400px;
+		max-width: 600px;
 	}
 
 	.input-group {
@@ -321,8 +407,13 @@
 		gap: 0.75rem;
 	}
 
-	.input-group input {
+	.input-wrapper {
+		position: relative;
 		flex: 1;
+	}
+
+	.input-group input {
+		width: 100%;
 		padding: 0.75rem;
 		border: 1px solid var(--bg-3);
 		border-radius: 4px;
@@ -410,5 +501,49 @@
 
 	.load-more-section button {
 		min-width: 200px;
+	}
+
+	.suggestions-dropdown {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background: var(--bg-1);
+		border: 1px solid var(--bg-3);
+		border-top: none;
+		border-radius: 0 0 4px 4px;
+		max-height: 200px;
+		overflow-y: auto;
+		z-index: 1000;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	}
+
+	.suggestion-item {
+		display: block;
+		width: 100%;
+		padding: 0.75rem;
+		text-align: left;
+		background: transparent;
+		border: none;
+		color: var(--txt-1);
+		cursor: pointer;
+		font-size: 0.875rem;
+		transition: background-color 0.15s ease;
+		border-bottom: 1px solid var(--bg-2);
+	}
+
+	.suggestion-item:last-child {
+		border-bottom: none;
+	}
+
+	.suggestion-item:hover,
+	.suggestion-item.selected {
+		background: var(--bg-2);
+		color: var(--acc-1);
+	}
+
+	.suggestion-item.selected {
+		background: var(--acc-1);
+		color: white;
 	}
 </style>
