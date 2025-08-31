@@ -23,20 +23,6 @@ function cleanTopics(topics) {
 }
 
 async function classifyIssues(repoContext, issues) {
-	if (!OPENAI_API_KEY) {
-		console.log('No OpenAI key available, using fallback classification');
-		// Return fallback classification if no OpenAI
-		return issues.map((issue) => ({
-			...issue,
-			ai_analysis: {
-				difficulty: 'medium',
-				difficulty_score: 2,
-				topics: ['general'],
-				summary: 'AI classification unavailable'
-			}
-		}));
-	}
-
 	const issuesText = issues
 		.map(
 			(issue) =>

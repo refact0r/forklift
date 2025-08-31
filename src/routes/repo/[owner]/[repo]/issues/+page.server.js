@@ -84,8 +84,6 @@ export async function load({ fetch, parent }) {
 			console.error('Failed to classify issues:', error);
 		}
 
-		console.log(classifiedIssues);
-
 		// Fallback: return issues with basic data if AI classification fails
 		if (classifiedIssues.length === 0) {
 			classifiedIssues = issuesToClassify.map((issue) => ({
