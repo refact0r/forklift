@@ -55,15 +55,15 @@
 	// Mock repo data for popular repositories
 	const popularRepos = [
 		{
-			owner: 'refact0r',
-			name: 'roocodehack',
-			fullName: 'refact0r/roocodehack',
-			description: 'Your shortcut to open source - find repositories, understand codebases, discover issues, and start contributing.',
-			stars: 1,
-			forks: 1,
-			language: 'Svelte',
-			topics: ['open-source', 'contributing', 'github', 'developer-tools'],
-			openIssues: 0,
+			owner: 'RooCodeInc',
+			name: 'Roo-Code',
+			fullName: 'RooCodeInc/Roo-Code',
+			description: 'Roo Code gives you a whole dev team of AI agents in your code editor.',
+			stars: 19100,
+			forks: 2100,
+			language: 'TypeScript',
+			topics: ['ai', 'code-editor', 'developer-tools', 'vscode-extension'],
+			openIssues: 398,
 			updatedAt: '2025-01-27T12:00:00Z'
 		},
 		{
