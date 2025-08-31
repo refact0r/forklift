@@ -108,7 +108,7 @@
 <div class="content">
 	<div class="hero">
 		<div class="left">
-			<h1>your shortcut to <span>open source</span></h1>
+			<h1>your fast track to <span>open source</span></h1>
 			<p>find repositories, understand codebases, discover issues, and start contributing.</p>
 		</div>
 		<div class="right">
