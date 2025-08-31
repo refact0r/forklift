@@ -55,16 +55,16 @@
 	// Mock repo data for popular repositories
 	const popularRepos = [
 		{
-			owner: 'facebook',
-			name: 'react',
-			fullName: 'facebook/react',
-			description: 'The library for web and native user interfaces.',
-			stars: 225000,
-			forks: 45000,
-			language: 'JavaScript',
-			topics: [],
-			openIssues: 800,
-			updatedAt: '2025-08-29T10:30:00Z'
+			owner: 'refact0r',
+			name: 'roocodehack',
+			fullName: 'refact0r/roocodehack',
+			description: 'Your shortcut to open source - find repositories, understand codebases, discover issues, and start contributing.',
+			stars: 1,
+			forks: 1,
+			language: 'Svelte',
+			topics: ['open-source', 'contributing', 'github', 'developer-tools'],
+			openIssues: 0,
+			updatedAt: '2025-01-27T12:00:00Z'
 		},
 		{
 			owner: 'microsoft',
