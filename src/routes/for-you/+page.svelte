@@ -51,32 +51,32 @@
 <div class="content">
 	{#if error}
 		<div class="error-state">
-			<h2>Unable to load recommendations</h2>
+			<h2>unable to load recommendations</h2>
 			<p>{error}</p>
 		</div>
 	{:else if !hasSkills}
 		<div class="no-skills-state">
-			<h2>Add some skills to get started</h2>
+			<h2>add some skills to get started</h2>
 			<p>
-				To see personalized repository recommendations, add your programming skills and interests in
+				to see personalized repository recommendations, add your programming skills and interests in
 				your profile.
 			</p>
-			<button class="button accent" onclick={() => goto('/profile')}> Go to Profile </button>
+			<button class="button accent" onclick={() => goto('/profile')}> go to profile </button>
 		</div>
 	{:else if recommendations.length === 0}
 		<div class="no-results-state">
-			<h2>No recommendations found</h2>
+			<h2>no recommendations found</h2>
 			<p>
-				We couldn't find any repositories matching your skills. Try adding more skills to your
+				we couldn't find any repositories matching your skills. try adding more skills to your
 				profile or check back later.
 			</p>
-			<button class="button secondary" onclick={() => goto('/profile')}> Manage Skills </button>
+			<button class="button secondary" onclick={() => goto('/profile')}> manage skills </button>
 		</div>
 	{:else}
 		<div class="header">
 			<div class="title-section">
-				<h1>For You</h1>
-				<p class="subtitle">Repositories recommended based on your skills and interests</p>
+				<h1>for you</h1>
+				<p class="subtitle">repositories recommended based on your skills and interests</p>
 			</div>
 
 			{#if userSkills && userSkills.length > 0}
@@ -116,9 +116,9 @@
 			</div>
 		{:else}
 			<div class="no-filter-results">
-				<p>No repositories found for {currentFilter}.</p>
+				<p>no repositories found for {currentFilter}.</p>
 				<button class="link-button" onclick={() => handleFilterChange('all')}>
-					Show all recommendations
+					show all recommendations
 				</button>
 			</div>
 		{/if}

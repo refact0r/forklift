@@ -67,7 +67,7 @@
 								Saved
 							{:else}
 								<BookmarkSimpleIcon />
-								Add to My List
+								add to my list
 							{/if}
 						</button>
 					{/if}

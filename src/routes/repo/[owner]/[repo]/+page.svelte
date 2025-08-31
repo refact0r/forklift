@@ -13,7 +13,7 @@
 
 {#if error}
 	<div class="error-section">
-		<p>Could not load overview data: {error}</p>
+		<p>could not load overview data: {error}</p>
 	</div>
 {:else if overview}
 	<section class="overview-section">

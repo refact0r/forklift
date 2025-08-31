@@ -182,19 +182,19 @@
 
 <div class="content">
 	{#if loading}
-		<div class="loading">Loading...</div>
+		<div class="loading">loading...</div>
 	{:else if !auth.user}
-		<div class="error">Please log in to view your profile.</div>
+		<div class="error">please log in to view your profile.</div>
 	{:else}
 		<div class="profile-header">
 			<h1>{auth.user.user_metadata?.user_name || auth.user.email}</h1>
-			<p>Manage your skills and development interests</p>
+			<p>manage your skills and development interests</p>
 		</div>
 
 		<div class="section">
-			<h3>Your Skills ({languages.length}/15)</h3>
+			<h3>your skills ({languages.length}/15)</h3>
 			<p class="section-description">
-				Add programming languages, frameworks, and tools you're familiar with or interested in
+				add programming languages, frameworks, and tools you're familiar with or interested in
 				learning
 			</p>
 
@@ -216,7 +216,7 @@
 				</div>
 			{:else}
 				<div class="empty-state">
-					<p>No skills added yet. Add some skills to personalize your experience!</p>
+					<p>no skills added yet. add some skills to personalize your experience!</p>
 				</div>
 			{/if}
 
@@ -252,15 +252,15 @@
 						disabled={saving || !newLanguage.trim() || languages.length >= 15}
 					>
 						<PlusIcon />
-						Add
+						add
 					</button>
 				</div>
 			</div>
 		</div>
 
 		<div class="section">
-			<h3>My List</h3>
-			<p class="section-description">Repositories you've saved for later</p>
+			<h3>my list</h3>
+			<p class="section-description">repositories you've saved for later</p>
 
 			{#if savedRepos.savedRepos.length > 0}
 				<div class="saved-repos-grid">
@@ -303,7 +303,7 @@
 			{:else}
 				<div class="empty-state">
 					<p>
-						No saved repositories yet. Browse repositories and click "Add to My List" to save them
+						no saved repositories yet. browse repositories and click "add to my list" to save them
 						here!
 					</p>
 				</div>
