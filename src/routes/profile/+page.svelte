@@ -25,7 +25,7 @@
 			goto('/');
 			return;
 		}
-		
+
 		await loadLanguages();
 		await savedRepos.loadSavedRepos();
 		await savedRepos.loadUserSkills();
@@ -33,7 +33,7 @@
 
 		// Add click outside listener
 		document.addEventListener('click', handleClickOutside);
-		
+
 		return () => {
 			document.removeEventListener('click', handleClickOutside);
 		};
@@ -51,13 +51,20 @@
 		if (error) {
 			console.error('Error loading languages:', error);
 		} else {
-			languages = data.map(item => item.language);
+			languages = data.map((item) => item.language);
 		}
 	}
 
 	async function addLanguage() {
 		const language = newLanguage.trim();
 		if (!language || !auth.user || languages.includes(language)) {
+			newLanguage = '';
+			return;
+		}
+
+		// Limit to 15 skills maximum
+		if (languages.length >= 15) {
+			alert('Maximum 15 skills allowed');
 			newLanguage = '';
 			return;
 		}
@@ -91,7 +98,7 @@
 		if (error) {
 			console.error('Error removing language:', error);
 		} else {
-			languages = languages.filter(lang => lang !== languageToRemove);
+			languages = languages.filter((lang) => lang !== languageToRemove);
 			// Update skills in savedRepos manager too
 			await savedRepos.loadUserSkills();
 		}
@@ -100,7 +107,7 @@
 
 	function handleInput() {
 		const query = newLanguage.trim();
-		
+
 		if (query.length === 0) {
 			showSuggestions = false;
 			filteredSuggestions = [];
@@ -108,12 +115,9 @@
 		}
 
 		// Filter suggestions based on input
-		const suggestions = COMMON_SKILLS
-			.filter(skill => 
-				skill.toLowerCase().includes(query.toLowerCase()) && 
-				!languages.includes(skill)
-			)
-			.slice(0, 8); // Show max 8 suggestions
+		const suggestions = COMMON_SKILLS.filter(
+			(skill) => skill.toLowerCase().includes(query.toLowerCase()) && !languages.includes(skill)
+		).slice(0, 8); // Show max 8 suggestions
 
 		filteredSuggestions = suggestions;
 		showSuggestions = suggestions.length > 0;
@@ -131,7 +135,10 @@
 		// Handle suggestion navigation
 		if (event.key === 'ArrowDown') {
 			event.preventDefault();
-			selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, filteredSuggestions.length - 1);
+			selectedSuggestionIndex = Math.min(
+				selectedSuggestionIndex + 1,
+				filteredSuggestions.length - 1
+			);
 		} else if (event.key === 'ArrowUp') {
 			event.preventDefault();
 			selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
@@ -164,10 +171,10 @@
 
 	async function loadMore() {
 		if (loadingMore) return;
-		
+
 		loadingMore = true;
 		// Simulate loading delay for better UX
-		await new Promise(resolve => setTimeout(resolve, 300));
+		await new Promise((resolve) => setTimeout(resolve, 300));
 		displayLimit += 10;
 		loadingMore = false;
 	}
@@ -185,16 +192,19 @@
 		</div>
 
 		<div class="section">
-			<h3>Your Skills</h3>
-			<p class="section-description">Add programming languages, frameworks, and tools you're familiar with or interested in learning</p>
-			
+			<h3>Your Skills ({languages.length}/15)</h3>
+			<p class="section-description">
+				Add programming languages, frameworks, and tools you're familiar with or interested in
+				learning
+			</p>
+
 			{#if languages.length > 0}
 				<div class="language-tags">
 					{#each languages as language}
 						<div class="language-tag">
 							<span class="language-name">{language}</span>
-							<button 
-								class="remove-btn" 
+							<button
+								class="remove-btn"
 								onclick={() => removeLanguage(language)}
 								disabled={saving}
 								title="Remove {language}"
@@ -236,10 +246,10 @@
 							</div>
 						{/if}
 					</div>
-					<button 
-						class="add-btn accent" 
+					<button
+						class="add-btn accent"
 						onclick={addLanguage}
-						disabled={saving || !newLanguage.trim()}
+						disabled={saving || !newLanguage.trim() || languages.length >= 15}
 					>
 						<PlusIcon />
 						Add
@@ -251,24 +261,26 @@
 		<div class="section">
 			<h3>My List</h3>
 			<p class="section-description">Repositories you've saved for later</p>
-			
+
 			{#if savedRepos.savedRepos.length > 0}
 				<div class="saved-repos-grid">
 					{#each savedRepos.savedRepos.slice(0, displayLimit) as savedRepo}
 						<div class="saved-repo-wrapper">
-							<RepoCard repo={{
-								owner: savedRepo.repo_owner,
-								name: savedRepo.repo_name,
-								fullName: savedRepo.repo_full_name,
-								description: savedRepo.repo_description,
-								stars: savedRepo.repo_stars,
-								forks: 0,
-								language: savedRepo.repo_language,
-								openIssues: 0,
-								updatedAt: savedRepo.saved_at,
-								topics: []
-							}} />
-							<button 
+							<RepoCard
+								repo={{
+									owner: savedRepo.repo_owner,
+									name: savedRepo.repo_name,
+									fullName: savedRepo.repo_full_name,
+									description: savedRepo.repo_description,
+									stars: savedRepo.repo_stars,
+									forks: 0,
+									language: savedRepo.repo_language,
+									openIssues: 0,
+									updatedAt: savedRepo.saved_at,
+									topics: []
+								}}
+							/>
+							<button
 								class="unsave-button"
 								onclick={() => savedRepos.unsaveRepo(savedRepo.repo_owner, savedRepo.repo_name)}
 								title="Remove from saved"
@@ -278,21 +290,22 @@
 						</div>
 					{/each}
 				</div>
-				
+
 				{#if savedRepos.savedRepos.length > displayLimit}
 					<div class="load-more-section">
-						<button 
-							class="button secondary"
-							onclick={loadMore}
-							disabled={loadingMore}
-						>
-							{loadingMore ? 'Loading...' : `Load More (${savedRepos.savedRepos.length - displayLimit} remaining)`}
+						<button class="button secondary" onclick={loadMore} disabled={loadingMore}>
+							{loadingMore
+								? 'Loading...'
+								: `Load More (${savedRepos.savedRepos.length - displayLimit} remaining)`}
 						</button>
 					</div>
 				{/if}
 			{:else}
 				<div class="empty-state">
-					<p>No saved repositories yet. Browse repositories and click "Add to My List" to save them here!</p>
+					<p>
+						No saved repositories yet. Browse repositories and click "Add to My List" to save them
+						here!
+					</p>
 				</div>
 			{/if}
 		</div>
@@ -340,10 +353,6 @@
 	.language-tag {
 		display: flex;
 		align-items: center;
-		background: var(--bg-2);
-		border: 1px solid var(--bg-3);
-		border-radius: 6px;
-		padding: 0.5rem 0.75rem;
 		gap: 0.5rem;
 		transition: all 0.2s;
 	}
@@ -366,7 +375,6 @@
 		display: flex;
 		align-items: center;
 		padding: 0.125rem;
-		border-radius: 3px;
 		transition: all 0.2s;
 		opacity: 0;
 	}
@@ -387,7 +395,6 @@
 	.empty-state {
 		background: var(--bg-2);
 		border: 1px dashed var(--bg-3);
-		border-radius: 8px;
 		padding: 2rem;
 		text-align: center;
 		margin-bottom: 1.5rem;
@@ -416,7 +423,6 @@
 		width: 100%;
 		padding: 0.75rem;
 		border: 1px solid var(--bg-3);
-		border-radius: 4px;
 		background: var(--bg-1);
 		color: var(--txt-1);
 		font-size: 0.875rem;
@@ -440,7 +446,8 @@
 		cursor: not-allowed;
 	}
 
-	.loading, .error {
+	.loading,
+	.error {
 		text-align: center;
 		padding: 3rem;
 		color: var(--txt-2);
@@ -468,7 +475,6 @@
 		right: 0.75rem;
 		background: var(--bg-1);
 		border: 1px solid var(--bg-3);
-		border-radius: 4px;
 		color: var(--txt-3);
 		cursor: pointer;
 		display: flex;
@@ -511,7 +517,6 @@
 		background: var(--bg-1);
 		border: 1px solid var(--bg-3);
 		border-top: none;
-		border-radius: 0 0 4px 4px;
 		max-height: 200px;
 		overflow-y: auto;
 		z-index: 1000;

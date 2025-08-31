@@ -70,6 +70,9 @@
 		width: 100%;
 		display: flex;
 		flex-direction: column;
+		max-width: 100%;
+		box-sizing: border-box;
+		overflow: hidden;
 	}
 
 	.repo-card:hover {
@@ -138,6 +141,8 @@
 		display: flex;
 		gap: 1rem;
 		color: var(--txt-2);
+		flex-wrap: wrap;
+		max-width: 100%;
 	}
 
 	.topic {

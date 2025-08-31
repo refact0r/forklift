@@ -22,10 +22,10 @@
 
 	async function toggleSaved() {
 		if (!auth.user || saving) return;
-		
+
 		saving = true;
 		const isCurrentlySaved = savedRepos.isRepoSaved(owner, repo);
-		
+
 		if (isCurrentlySaved) {
 			await savedRepos.unsaveRepo(owner, repo);
 		} else {
@@ -38,7 +38,7 @@
 				language: repoData.language
 			});
 		}
-		
+
 		saving = false;
 	}
 

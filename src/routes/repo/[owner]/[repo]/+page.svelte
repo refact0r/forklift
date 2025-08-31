@@ -42,7 +42,10 @@
 					<h4>languages</h4>
 					<div class="tech-tags">
 						{#each overview.project_landscape.languages as lang}
-							<span class="tech-tag" class:highlighted={isMatchingSkill(lang, savedRepos.userSkills)}>{lang}</span>
+							<span
+								class="tech-tag"
+								class:highlighted={isMatchingSkill(lang, savedRepos.userSkills)}>{lang}</span
+							>
 						{/each}
 					</div>
 				</div>
@@ -53,7 +56,10 @@
 					<h4>tools & frameworks</h4>
 					<div class="tech-tags">
 						{#each overview.project_landscape.tools as tool}
-							<span class="tech-tag" class:highlighted={isMatchingSkill(tool, savedRepos.userSkills)}>{tool}</span>
+							<span
+								class="tech-tag"
+								class:highlighted={isMatchingSkill(tool, savedRepos.userSkills)}>{tool}</span
+							>
 						{/each}
 					</div>
 				</div>

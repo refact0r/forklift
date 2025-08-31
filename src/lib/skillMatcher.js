@@ -10,33 +10,33 @@ export function findMatchingSkills(repoTech, userSkills) {
 	}
 
 	const matches = new Set();
-	
+
 	// Normalize for comparison
 	const normalize = (str) => str.toLowerCase().trim();
-	
+
 	const normalizedUserSkills = userSkills.map(normalize);
 	const allRepoTech = [...(repoTech.languages || []), ...(repoTech.tools || [])];
 	const normalizedRepoTech = allRepoTech.map(normalize);
-	
+
 	// Direct matches
 	normalizedRepoTech.forEach((tech, idx) => {
 		if (normalizedUserSkills.includes(tech)) {
 			matches.add(allRepoTech[idx]); // Add original casing
 		}
 	});
-	
+
 	// Partial matches (contains)
 	allRepoTech.forEach((repoTechOriginal, idx) => {
 		const repoTechNorm = normalize(repoTechOriginal);
-		
-		normalizedUserSkills.forEach(userSkillNorm => {
+
+		normalizedUserSkills.forEach((userSkillNorm) => {
 			// Check if one contains the other (e.g., "react" matches "reactjs")
 			if (repoTechNorm.includes(userSkillNorm) || userSkillNorm.includes(repoTechNorm)) {
 				matches.add(repoTechOriginal);
 			}
 		});
 	});
-	
+
 	return Array.from(matches);
 }
 
@@ -61,7 +61,7 @@ export function isMatchingSkill(skill, userSkills) {
 	}
 
 	// Partial match
-	return normalizedUserSkills.some(userSkill => 
-		normalizedSkill.includes(userSkill) || userSkill.includes(normalizedSkill)
+	return normalizedUserSkills.some(
+		(userSkill) => normalizedSkill.includes(userSkill) || userSkill.includes(normalizedSkill)
 	);
 }
