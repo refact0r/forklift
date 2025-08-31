@@ -30,7 +30,7 @@
 	</div>
 
 	{#if repo.description}
-		<p class="repo-description">{repo.description}</p>
+		<p class="repo-description">{repo.description.length > 200 ? repo.description.substring(0, 200) + '...' : repo.description}</p>
 	{/if}
 
 	<div class="repo-meta" class:small={repo.topics.length === 0}>
@@ -110,6 +110,12 @@
 
 	.repo-description {
 		margin: 0 0 1rem 0;
+		line-height: 1.4;
+		max-height: calc(1.4em * 3);
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
 	}
 
 	.repo-meta {
