@@ -105,6 +105,10 @@
 	];
 </script>
 
+<svelte:head>
+	<title>forklift | home</title>
+</svelte:head>
+
 <div class="content">
 	<div class="hero">
 		<div class="left">
