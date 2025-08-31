@@ -132,6 +132,5 @@
 
 	.tech-tag.highlighted {
 		border-color: var(--acc-1);
-		font-weight: 800;
 	}
 </style>

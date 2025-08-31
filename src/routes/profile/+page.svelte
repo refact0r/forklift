@@ -368,7 +368,6 @@
 	.language-name {
 		color: var(--acc-1);
 		font-size: 0.875rem;
-		font-weight: 500;
 	}
 
 	.remove-btn {
