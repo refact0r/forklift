@@ -86,7 +86,7 @@
 <section>
 	<h2>description</h2>
 	{#if data.issue.body}
-		<div class="issue-body">
+		<div class="markdown-content">
 			{@html marked(data.issue.body)}
 		</div>
 	{:else}
@@ -97,9 +97,9 @@
 <!-- Implementation Guide -->
 {#if data.implementationGuide}
 	<section>
-		<h2>ai implementation guide</h2>
-		<div class="implementation-guide">
-			<pre>{data.implementationGuide}</pre>
+		<h2>implementation guide</h2>
+		<div class="markdown-content">
+			{@html marked(data.implementationGuide)}
 		</div>
 	</section>
 {/if}
@@ -175,40 +175,6 @@
 
 	h4 {
 		margin: 0 0 0.75rem 0;
-	}
-
-	.issue-body,
-	.implementation-guide {
-		border: 1px solid var(--bg-3);
-		padding: 1.5rem;
-	}
-
-	.issue-body :global(*:first-child) {
-		margin-top: 0;
-	}
-
-	.issue-body :global(code) {
-		background: var(--bg-2);
-		border: 1px solid var(--bg-3);
-		font-family: 'DM Mono', monospace;
-		padding: 0.125rem 0.25rem;
-	}
-
-	.issue-body :global(pre) {
-		background: var(--bg-2);
-		border: 1px solid var(--bg-3);
-		padding: 0.5rem 0.75rem;
-		overflow-x: auto;
-	}
-
-	.issue-body :global(pre code) {
-		border: none;
-	}
-
-	.implementation-guide pre {
-		white-space: pre-wrap;
-		margin: 0;
-		font-family: inherit;
 	}
 
 	.difficulty-badge {

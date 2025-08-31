@@ -127,6 +127,7 @@
 	}
 
 	.difficulty-badge {
+		font-size: 0.875rem;
 	}
 
 	.issue-title {

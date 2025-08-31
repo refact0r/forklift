@@ -19,7 +19,8 @@ export async function POST({ request }) {
 		}
 
 		// Create implementation guide prompt
-		const prompt = `You are a senior software engineer helping a developer implement a solution for a GitHub issue. Generate a comprehensive implementation guide.
+		const prompt = `You are a repository onboarding assistant that helps developers implement a solution to a GitHub issue. Generate a practical and actionable but concise implementation guide in MARKDOWN FORMAT.
+Assume the developer already has the project set up. Provide pointers on how the issue might be solved. Do not add a top level heading (h1) or introductory text.
 
 REPOSITORY CONTEXT:
 - Name: ${repoContext.name}
@@ -29,51 +30,19 @@ REPOSITORY CONTEXT:
 
 ISSUE DETAILS:
 - Title: ${issue.title}
-- Number: #${issue.number}
 - Body: ${issue.body || 'No description provided'}
 - Labels: ${(issue.labels || []).map((l) => l.name).join(', ')}
 
 ${
 	aiAnalysis
-		? `AI ANALYSIS:
-- Difficulty: ${aiAnalysis.difficulty}
-- Topics: ${aiAnalysis.topics?.join(', ')}
+		? `- Topics: ${aiAnalysis.topics?.join(', ')}
 - Summary: ${aiAnalysis.summary}
 `
 		: ''
 }
 
-README CONTENT (first 2000 chars):
-${(repoContext.readme || '').substring(0, 2000)}
-
-Generate a detailed implementation guide with the following sections:
-
-1. **Understanding the Issue**
-   - What needs to be done
-   - Why this change is needed
-   - Expected outcome
-
-2. **Technical Approach**
-   - High-level solution strategy
-   - Key files/components that need changes
-   - Dependencies or prerequisites
-
-3. **Step-by-Step Implementation**
-   - Specific coding steps
-   - Code snippets or examples where helpful
-   - Testing approach
-
-4. **Edge Cases & Considerations**
-   - Potential challenges
-   - Things to watch out for
-   - Performance or security considerations
-
-5. **Validation**
-   - How to test the implementation
-   - Acceptance criteria
-   - How to verify the fix works
-
-Keep the guide practical and actionable. Include code examples where relevant, but focus on the implementation strategy rather than complete code solutions.`;
+README CONTENT (first 5000 chars):
+${(repoContext.readme || '').substring(0, 5000)}`;
 
 		// Call OpenAI using the modern responses API
 		const response = await openai.responses.create({

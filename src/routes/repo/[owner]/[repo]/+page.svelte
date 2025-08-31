@@ -70,7 +70,7 @@
 	{#if overview.onboarding_essentials}
 		<section class="overview-section">
 			<h2>onboarding essentials</h2>
-			<div class="onboarding-content">
+			<div class="markdown-content">
 				{@html marked(overview.onboarding_essentials)}
 			</div>
 		</section>
@@ -133,32 +133,5 @@
 	.tech-tag.highlighted {
 		border-color: var(--acc-1);
 		font-weight: 800;
-	}
-
-	.onboarding-content {
-		border: 1px solid var(--bg-3);
-		padding: 1.5rem;
-	}
-
-	.onboarding-content :global(*:first-child) {
-		margin-top: 0;
-	}
-
-	.onboarding-content :global(code) {
-		background: var(--bg-2);
-		border: 1px solid var(--bg-3);
-		font-family: 'DM Mono', monospace;
-		padding: 0.125rem 0.25rem;
-	}
-
-	.onboarding-content :global(pre) {
-		background: var(--bg-2);
-		border: 1px solid var(--bg-3);
-		padding: 0.5rem 0.75rem;
-		overflow-x: auto;
-	}
-
-	.onboarding-content :global(pre code) {
-		border: none;
 	}
 </style>

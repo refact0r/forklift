@@ -155,3 +155,31 @@ input::placeholder {
 		color: var(--bg-1);
 	}
 }
+
+/* Markdown content styling */
+.markdown-content {
+	border: 1px solid var(--bg-3);
+	padding: 1.5rem;
+}
+
+.markdown-content *:first-child {
+	margin-top: 0;
+}
+
+.markdown-content code {
+	background: var(--bg-2);
+	border: 1px solid var(--bg-3);
+	font-family: 'DM Mono', monospace;
+	padding: 0.125rem 0.25rem;
+}
+
+.markdown-content pre {
+	background: var(--bg-2);
+	border: 1px solid var(--bg-3);
+	padding: 0.5rem 0.75rem;
+	overflow-x: auto;
+}
+
+.markdown-content pre code {
+	border: none;
+}
