@@ -1,16 +1,12 @@
-import { json } from '@sveltejs/kit';
 import { OPENAI_API_KEY } from '$env/static/private';
+import { json } from '@sveltejs/kit';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
 	apiKey: OPENAI_API_KEY
 });
 
-export async function POST({ request, setHeaders }) {
-	setHeaders({
-		'cache-control': 'max-age=3600'
-	});
-
+export async function POST({ request }) {
 	let repoData;
 
 	try {
@@ -51,7 +47,7 @@ DESCRIPTION: ${repoData.description}
 STARS: ${repoData.stars} | LANGUAGE: ${repoData.language}
 TOPICS: ${repoData.topics?.join(', ') || 'None'}
 TECH STACK DATA:
-- Languages: ${repoData.languages?.join(', ') || 'Unknown'}
+- Languages: ${Object.keys(repoData.languages || {}).join(', ') || 'Unknown'}
 - File extensions: ${repoData.fileExtensions?.slice(0, 20).join(', ') || 'None'}
 
 README CONTENT:
@@ -86,7 +82,8 @@ ${packageInfo || 'No package files found'}`;
 		// Return fallback response for any error (API, network, JSON parsing, etc.)
 		const fallbackOverview = {
 			project_landscape: {
-				languages: repoData?.languages || [repoData?.language].filter(Boolean) || [],
+				languages:
+					Object.keys(repoData?.languages || {}) || [repoData?.language].filter(Boolean) || [],
 				frameworks: [],
 				tools: [],
 				skills: []

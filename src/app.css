@@ -10,6 +10,8 @@
 	--bg-1: hsl(60, 10%, 6%);
 	--acc-1: hsl(60, 60%, 60%);
 	--acc-2: hsl(60, 60%, 45%);
+	--green: hsl(140, 60%, 60%);
+	--red: hsl(0, 60%, 60%);
 	font-family: 'DM Mono', monospace;
 	font-weight: 300;
 }

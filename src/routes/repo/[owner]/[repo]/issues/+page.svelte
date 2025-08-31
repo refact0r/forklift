@@ -3,55 +3,42 @@
 
 	let { data } = $props();
 
-	// Use real issues data from the load function
-	let issues = $state(data.issues || []);
+	// Use classified issues data from the load function
+	let issues = $state(data.classifiedIssues || []);
 	let error = $state(data.error);
 
-	function goBack() {
-		goto(`/repo/${data.owner}/${data.repo}`);
+	function viewIssue(issue) {
+		goto(`/repo/${data.owner}/${data.repo}/issues/${issue.number}`);
 	}
 
 	function openInGitHub(issue) {
-		if (issue.url) {
-			window.open(issue.url, '_blank');
+		if (issue.html_url) {
+			window.open(issue.html_url, '_blank');
 		}
 	}
 
 	function getDifficultyColor(difficulty) {
 		switch (difficulty?.toLowerCase()) {
 			case 'easy':
-				return '#4caf50';
+				return 'var(--green)';
 			case 'medium':
-				return '#ff9800';
+				return 'var(--acc-1)';
 			case 'hard':
-				return '#f44336';
+				return 'var(--red)';
 			default:
-				return '#666';
-		}
-	}
-
-	function getDifficultyLabel(difficulty) {
-		switch (difficulty?.toLowerCase()) {
-			case 'easy':
-				return 'Easy';
-			case 'medium':
-				return 'Medium';
-			case 'hard':
-				return 'Hard';
-			default:
-				return 'Unknown';
+				return 'var(--txt-3)';
 		}
 	}
 </script>
 
 {#if error}
-	<div class="error-message">
+	<div class="error-section">
 		<h2>Error Loading Issues</h2>
 		<p>{error}</p>
 		<p>Please check that the repository exists and has public issues.</p>
 	</div>
 {:else if issues.length === 0}
-	<div class="no-issues">
+	<div class="empty-section">
 		<h2>No Open Issues Found</h2>
 		<p>This repository doesn't have any open issues at the moment.</p>
 		<p>
@@ -59,240 +46,138 @@
 		</p>
 	</div>
 {:else}
-	<div class="issues-container">
-		<div class="issues-header">
-			<h2>Available Issues ({issues.length})</h2>
-		</div>
+	<div class="issues-header">
+		<h2>{issues.length} open issue{issues.length === 1 ? '' : 's'}</h2>
+	</div>
 
-		<div class="issues-table">
-			<div class="table-header">
-				<div class="col-number">#</div>
-				<div class="col-title">Title</div>
-				<div class="col-difficulty">Difficulty</div>
-				<div class="col-action">Action</div>
-			</div>
+	<div class="issues-list">
+		{#each issues as issue}
+			<div
+				class="issue-card"
+				onclick={() => viewIssue(issue)}
+				role="button"
+				tabindex="0"
+				onkeydown={(e) => {
+					if (e.key === 'Enter' || e.key === ' ') viewIssue(issue);
+				}}
+			>
+				<div class="issue-header">
+					<span class="issue-number">#{issue.number}</span>
+					<span
+						class="difficulty-badge"
+						style="color: {getDifficultyColor(issue.ai_analysis?.difficulty)}"
+					>
+						{issue.ai_analysis?.difficulty || 'unknown'}
+					</span>
 
-			{#each issues as issue}
-				<div class="issue-row">
-					<div class="col-number">{issue.number}</div>
-					<div class="col-title">
-						<span class="issue-title">{issue.title}</span>
-					</div>
-					<div class="col-difficulty">
-						<span
-							class="difficulty-badge"
-							style="background-color: {getDifficultyColor(issue.difficulty)}"
-						>
-							{getDifficultyLabel(issue.difficulty)}
-						</span>
-					</div>
-					<div class="col-action">
-						<button class="solve-btn" onclick={() => openInGitHub(issue)}> View Issue </button>
-					</div>
+					{#if issue.ai_analysis?.topics && issue.ai_analysis.topics.length > 0}
+						<div class="topics">
+							{#each issue.ai_analysis.topics.slice(0, 4) as topic}
+								<span class="topic-tag">{topic}</span>
+							{/each}
+						</div>
+					{/if}
 				</div>
-			{/each}
-		</div>
+
+				<h3 class="issue-title">{issue.title}</h3>
+
+				{#if issue.ai_analysis?.summary}
+					<p class="issue-summary">{issue.ai_analysis.summary}</p>
+				{/if}
+
+				<div class="issue-actions">
+					<span class="view-btn">view details</span>
+					<button
+						class="github-btn"
+						onclick={(e) => {
+							e.stopPropagation();
+							openInGitHub(issue);
+						}}
+					>
+						github
+					</button>
+				</div>
+			</div>
+		{/each}
 	</div>
 {/if}
 
 <style>
-	.container {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 2rem;
-	}
-
-	.header {
-		margin-bottom: 2rem;
-	}
-
-	.back-btn {
-		background: none;
-		border: none;
-		color: #007acc;
-		cursor: pointer;
-		font-size: 1rem;
-		margin-bottom: 1rem;
-	}
-
-	.back-btn:hover {
-		text-decoration: underline;
-	}
-
-	h1 {
-		margin: 0 0 0.5rem 0;
-		font-size: 2rem;
-	}
-
-	.subtitle {
-		color: #666;
-		margin: 0;
-	}
-
-	.error-message {
-		background: #fee;
-		border: 1px solid #fcc;
-		border-radius: 8px;
-		padding: 2rem;
+	.error-section,
+	.empty-section {
 		text-align: center;
 		padding: 2rem;
 		color: var(--txt-2);
-	}
-
-	.empty-state {
-		text-align: center;
-		padding: 3rem 1rem;
-		color: var(--txt-2);
-	}
-
-	.no-issues h2 {
-		margin-top: 0;
-		color: #004499;
-	}
-
-	.issues-container {
-		background: white;
-		border-radius: 8px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-		overflow: hidden;
-	}
-
-	.issues-header {
-		padding: 1.5rem;
-		border-bottom: 1px solid #eee;
 	}
 
 	.issues-header h2 {
-		margin: 0;
-		font-size: 1.5rem;
+		color: var(--acc-1);
+		margin: 0 0 1rem 0;
 	}
 
-	.issues-table {
-		width: 100%;
-	}
-
-	.table-header {
-		display: grid;
-		grid-template-columns: 80px 1fr 120px 120px;
+	.issues-list {
+		display: flex;
+		flex-direction: column;
 		gap: 1rem;
-		padding: 1rem 1.5rem;
-		background: #f8f9fa;
-		border-bottom: 1px solid #eee;
-		font-weight: 600;
-		color: #333;
 	}
 
-	.issue-row {
-		display: grid;
-		grid-template-columns: 80px 1fr 120px 120px;
-		gap: 1rem;
-		padding: 1rem 1.5rem;
-		border-bottom: 1px solid #eee;
-		align-items: center;
-		transition: background-color 0.2s;
+	.issue-card {
+		/* background: var(--bg-2); */
+		border: 1px solid var(--bg-3);
+		padding: 1.5rem;
+		cursor: pointer;
 	}
 
-	.issue-row:hover {
-		background-color: #f8f9fa;
+	.issue-card:hover {
+		border-color: var(--acc-1);
 	}
 
-	.issue-row:last-child {
-		border-bottom: none;
-	}
-
-	.col-number {
-		font-weight: 600;
-		color: #666;
-	}
-
-	.col-title {
+	.issue-header {
 		display: flex;
 		align-items: center;
+		gap: 1rem;
+		margin-bottom: 1rem;
 	}
 
-	.issue-title {
-		font-weight: 500;
-		color: #333;
-		line-height: 1.4;
-	}
-
-	.col-difficulty {
-		display: flex;
-		justify-content: center;
+	.issue-number {
+		color: var(--txt-2);
 	}
 
 	.difficulty-badge {
-		color: white;
-		padding: 0.25rem 0.75rem;
-		border-radius: 12px;
-		font-size: 0.75rem;
-		font-weight: bold;
-		text-align: center;
-		min-width: 60px;
 	}
 
-	.col-action {
+	.issue-title {
+		margin: 0 0 1rem 0;
+		color: var(--txt-0);
+	}
+
+	.topics {
 		display: flex;
-		justify-content: center;
+		flex-wrap: wrap;
+		gap: 1rem;
 	}
 
-	.solve-btn {
-		background: #007acc;
-		color: white;
-		border: none;
-		padding: 0.5rem 1rem;
-		border-radius: 6px;
+	.topic-tag {
+		color: var(--txt-2);
 		font-size: 0.875rem;
-		cursor: pointer;
-		transition: background-color 0.2s;
 	}
 
-	.solve-btn:hover {
-		background: #005a9e;
+	.issue-summary {
+		margin: 0 0 1rem 0;
 	}
 
-	/* Responsive design */
-	@media (max-width: 768px) {
-		.container {
-			padding: 1rem;
-		}
-
-		.table-header,
-		.issue-row {
-			grid-template-columns: 60px 1fr 100px;
-			gap: 0.5rem;
-			padding: 0.75rem 1rem;
-		}
-
-		.col-action {
-			display: none;
-		}
-
-		.issue-title {
-			font-size: 0.9rem;
-		}
-
-		.difficulty-badge {
-			font-size: 0.7rem;
-			padding: 0.2rem 0.5rem;
-		}
+	.issue-actions {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-top: auto;
 	}
 
-	@media (max-width: 480px) {
-		.table-header,
-		.issue-row {
-			grid-template-columns: 50px 1fr 80px;
-			gap: 0.25rem;
-			padding: 0.5rem;
-		}
+	.view-btn {
+		color: var(--acc-1);
+	}
 
-		.issue-title {
-			font-size: 0.8rem;
-		}
-
-		.difficulty-badge {
-			font-size: 0.65rem;
-			padding: 0.15rem 0.4rem;
-		}
+	.github-btn {
+		font-size: 0.875rem;
 	}
 </style>

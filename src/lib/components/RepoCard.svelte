@@ -49,11 +49,11 @@
 		</div>
 		{#if repo.topics.length > 0}
 			<div class="repo-topics">
-				{#each repo.topics.slice(0, 4) as topic}
+				{#each repo.topics.slice(0, 3) as topic}
 					<span class="topic">{topic}</span>
 				{/each}
-				{#if repo.topics.length > 4}
-					<span class="topic-more">+{repo.topics.length - 4}</span>
+				{#if repo.topics.length > 3}
+					<span class="topic-more">+{repo.topics.length - 3}</span>
 				{/if}
 			</div>
 		{/if}

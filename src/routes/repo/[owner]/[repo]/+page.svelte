@@ -3,7 +3,7 @@
 
 	let { data } = $props();
 
-	console.log(data);
+	// console.log(data);
 
 	// Extract data for easier access
 	const { overview, error } = data;

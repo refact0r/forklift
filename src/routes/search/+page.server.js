@@ -1,7 +1,12 @@
 import { GITHUB_TOKEN } from '$env/static/private';
 
-export async function load({ url, fetch }) {
+export async function load({ url, fetch, setHeaders }) {
 	const query = url.searchParams.get('q');
+
+	// Set cache headers for 1 hour
+	setHeaders({
+		'cache-control': 'max-age=3600, s-maxage=3600'
+	});
 
 	if (!query) {
 		return {
@@ -33,11 +38,6 @@ export async function load({ url, fetch }) {
 		}
 
 		const data = await response.json();
-
-		console.log(data);
-		console.log(
-			`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=20`
-		);
 
 		const results = data.items.map((repo) => ({
 			id: repo.id,

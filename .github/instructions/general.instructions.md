@@ -24,7 +24,23 @@ The /repo page should focus on providing a good onboarding experience with three
 
 ### issues
 
-within the /repo page, there should be a /issues page that lists some of the open issues in the repository. these issues should be summarized with AI, and given a difficulty label (easy/medium/hard).
+Within the /repo page, there should be a /issues page that lists open issues from the repository. Each issue should be analyzed natively using OpenAI to:
+
+- **Classify difficulty** (Easy/Medium/Hard) based on code complexity, scope, and beginner-friendliness
+- **Generate topics/tags** (e.g., "docs", "api", "testing", "typescript") for categorization
+
+The issues page should display:
+
+- Page heading with issue count
+- Table/list showing: issue number, title, difficulty badge, clickable indicator or button
+
+### individual issue page
+
+Clicking an issue should navigate to /repo/[owner]/[repo]/issues/[number] showing:
+
+- **Issue details** (title, number, description, labels, GitHub link)
+- **Difficulty context** explaining why it received its difficulty rating
+- **AI-generated implementation guide** with suggested changes
 
 ## technical details
 
@@ -32,4 +48,4 @@ This is a SvelteKit app using Svelte 5. ALWAYS FOLLOW SVELTE 5 CONVENTIONS, INCL
 
 ### css
 
-Write as little CSS as possible. Make use of global styles and utility classes in /src/app.css.
+Write as little CSS as possible. Make use of global styles and utility classes in /src/app.css. No rounded corners.
