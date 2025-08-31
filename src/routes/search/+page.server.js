@@ -5,7 +5,7 @@ export async function load({ url, fetch, setHeaders }) {
 
 	// Set cache headers for 1 hour
 	setHeaders({
-		'cache-control': 'max-age=3600, s-maxage=3600'
+		'cache-control': 'public, max-age=3600, s-maxage=3600'
 	});
 
 	if (!query) {
@@ -17,8 +17,7 @@ export async function load({ url, fetch, setHeaders }) {
 	}
 
 	const headers = {
-		Accept: 'application/vnd.github.v3+json',
-		'User-Agent': 'SvelteKit-Open-Source-Helper'
+		Accept: 'application/vnd.github.v3+json'
 	};
 
 	// Add GitHub token if available

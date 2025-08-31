@@ -84,12 +84,6 @@
 		color: var(--txt-2);
 	}
 
-	.loading-section {
-		text-align: center;
-		padding: 2rem;
-		color: var(--txt-2);
-	}
-
 	h2 {
 		color: var(--acc-1);
 		margin: 0 0 1rem 0;

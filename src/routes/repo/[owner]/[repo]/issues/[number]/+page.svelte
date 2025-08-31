@@ -1,27 +1,10 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { marked } from 'marked';
 
 	let { data } = $props();
 
-	function goBack() {
-		goto(`/repo/${data.owner}/${data.repo}/issues`);
-	}
-
 	function openInGitHub() {
 		window.open(data.issue.html_url, '_blank');
-	}
-
-	function getDifficultyColor(difficulty) {
-		switch (difficulty?.toLowerCase()) {
-			case 'easy':
-				return '#10B981'; // green
-			case 'medium':
-				return '#F59E0B'; // yellow
-			case 'hard':
-				return '#EF4444'; // red
-			default:
-				return '#6B7280'; // gray
-		}
 	}
 
 	function formatDate(dateString) {
@@ -33,420 +16,234 @@
 	}
 </script>
 
-<div class="container">
-	<div class="header">
-		<button class="back-btn" onclick={goBack}>← Back to Issues</button>
-		<div class="issue-meta">
-			<div class="issue-number">#{data.issue.number}</div>
-			<h1 class="issue-title">{data.issue.title}</h1>
-			<div class="issue-info">
-				<span class="issue-state {data.issue.state}">{data.issue.state}</span>
-				<span class="issue-date">opened on {formatDate(data.issue.created_at)}</span>
-				<span class="issue-author">by {data.issue.user.login}</span>
-			</div>
-		</div>
+<div class="header">
+	<div class="header-row">
+		<h1>{data.issue.title}</h1>
+		<button class="button" onclick={openInGitHub}>github</button>
 	</div>
+	<div class="header-content">
+		<!-- <span class="issue-state {data.issue.state}">{data.issue.state}</span> -->
+		<span class="issue-number">#{data.issue.number}</span>
+		<span>opened on {formatDate(data.issue.created_at)}</span>
+		<span>by {data.issue.user.login}</span>
+	</div>
+</div>
 
-	<div class="content-grid">
-		<div class="main-content">
-			<!-- Issue Description -->
-			<div class="section">
-				<h2>Description</h2>
-				<div class="issue-body">
-					{#if data.issue.body}
-						<pre class="description-text">{data.issue.body}</pre>
-					{:else}
-						<p class="no-description">No description provided.</p>
-					{/if}
+<!-- Quick Analysis -->
+{#if data.aiAnalysis}
+	<div class="analysis-section">
+		<h2>quick analysis</h2>
+
+		<!-- First row: difficulty, topics, labels -->
+		<div class="analysis-row">
+			<div class="analysis-item">
+				<h4>difficulty</h4>
+				<div class="difficulty-badge {data.aiAnalysis.difficulty}">
+					{data.aiAnalysis.difficulty || 'unknown'}
 				</div>
-				<button class="github-btn" onclick={openInGitHub}> View on GitHub </button>
 			</div>
 
-			<!-- Implementation Guide -->
-			{#if data.implementationGuide}
-				<div class="section">
-					<h2>AI Implementation Guide</h2>
-					<div class="implementation-guide">
-						<pre class="guide-text">{data.implementationGuide}</pre>
-					</div>
-				</div>
-			{/if}
-		</div>
-
-		<div class="sidebar">
-			<!-- AI Analysis -->
-			{#if data.aiAnalysis}
-				<div class="analysis-card">
-					<h3>AI Analysis</h3>
-
-					<div class="analysis-item">
-						<span class="analysis-label">Difficulty</span>
-						<div
-							class="difficulty-badge"
-							style="background-color: {getDifficultyColor(data.aiAnalysis.difficulty)}"
-						>
-							{data.aiAnalysis.difficulty || 'Unknown'}
-						</div>
-					</div>
-
-					{#if data.aiAnalysis.topics && data.aiAnalysis.topics.length > 0}
-						<div class="analysis-item">
-							<span class="analysis-label">Topics</span>
-							<div class="topics">
-								{#each data.aiAnalysis.topics as topic}
-									<span class="topic-tag">{topic}</span>
-								{/each}
-							</div>
-						</div>
-					{/if}
-
-					{#if data.aiAnalysis.summary}
-						<div class="analysis-item">
-							<span class="analysis-label">Summary</span>
-							<p class="summary-text">{data.aiAnalysis.summary}</p>
-						</div>
-					{/if}
-				</div>
-			{/if}
-
-			<!-- Labels -->
-			{#if data.issue.labels && data.issue.labels.length > 0}
-				<div class="labels-card">
-					<h3>Labels</h3>
-					<div class="labels">
-						{#each data.issue.labels as label}
-							<span
-								class="label-tag"
-								style="background-color: #{label.color}; color: {label.color === 'ffffff'
-									? '#000'
-									: '#fff'}"
-							>
-								{label.name}
-							</span>
+			{#if data.aiAnalysis.topics && data.aiAnalysis.topics.length > 0}
+				<div class="analysis-item">
+					<h4>topics</h4>
+					<div class="topics">
+						{#each data.aiAnalysis.topics as topic}
+							<span class="topic-tag">{topic}</span>
 						{/each}
 					</div>
 				</div>
 			{/if}
 
-			<!-- Repository Info -->
-			<div class="repo-card">
-				<h3>Repository</h3>
-				<div class="repo-name">{data.owner}/{data.repo}</div>
-				{#if data.repoContext.description}
-					<p class="repo-description">{data.repoContext.description}</p>
-				{/if}
-				{#if data.repoContext.languages && Object.keys(data.repoContext.languages).length > 0}
-					<div class="languages">
-						<span class="analysis-label">Languages</span>
-						<div class="language-list">
-							{#each Object.keys(data.repoContext.languages) as language}
-								<span class="language-tag">{language}</span>
-							{/each}
-						</div>
+			{#if data.issue.labels && data.issue.labels.length > 0}
+				<div class="analysis-item">
+					<h4>labels</h4>
+					<div class="labels">
+						{#each data.issue.labels as label}
+							<span class="label-tag">{label.name}</span>
+						{/each}
 					</div>
-				{/if}
-			</div>
+				</div>
+			{/if}
 		</div>
+
+		<!-- Second row: summary -->
+		{#if data.aiAnalysis.summary}
+			<div class="analysis-row">
+				<div class="analysis-item summary-item">
+					<h4>summary</h4>
+					<p class="summary">{data.aiAnalysis.summary}</p>
+				</div>
+			</div>
+		{/if}
 	</div>
-</div>
+{/if}
+
+<!-- Issue Description -->
+<section>
+	<h2>description</h2>
+	{#if data.issue.body}
+		<div class="issue-body">
+			{@html marked(data.issue.body)}
+		</div>
+	{:else}
+		<p>No description provided.</p>
+	{/if}
+</section>
+
+<!-- Implementation Guide -->
+{#if data.implementationGuide}
+	<section>
+		<h2>ai implementation guide</h2>
+		<div class="implementation-guide">
+			<pre>{data.implementationGuide}</pre>
+		</div>
+	</section>
+{/if}
 
 <style>
-	.container {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 2rem;
-	}
-
 	.header {
 		margin-bottom: 2rem;
 	}
 
-	.back-btn {
-		background: none;
-		border: none;
-		color: #007acc;
-		cursor: pointer;
-		font-size: 1rem;
+	.header-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		margin-bottom: 1rem;
 	}
 
-	.back-btn:hover {
-		text-decoration: underline;
+	h1 {
+		color: var(--acc-1);
+		margin: 0;
 	}
 
-	.issue-meta {
-		margin-bottom: 2rem;
-	}
-
-	.issue-number {
-		font-size: 1.2rem;
-		color: #666;
-		font-weight: 600;
-		margin-bottom: 0.5rem;
-	}
-
-	.issue-title {
-		margin: 0 0 1rem 0;
-		font-size: 2rem;
-		font-weight: 600;
-		color: #1a1a1a;
-		line-height: 1.3;
-	}
-
-	.issue-info {
+	.header-content {
 		display: flex;
 		align-items: center;
+		color: var(--txt-2);
 		gap: 1rem;
-		color: #666;
-		font-size: 0.9rem;
 	}
 
 	.issue-state {
-		padding: 0.25rem 0.75rem;
-		border-radius: 12px;
-		font-size: 0.75rem;
-		font-weight: 600;
-		text-transform: capitalize;
+		padding: 0.25rem 0.5rem;
 	}
 
 	.issue-state.open {
-		background: #dcfdf7;
-		color: #065f46;
+		background: var(--green);
+		color: var(--bg-1);
 	}
 
 	.issue-state.closed {
-		background: #fee2e2;
-		color: #991b1b;
+		background: var(--red);
+		color: var(--bg-1);
 	}
 
-	.content-grid {
-		display: grid;
-		grid-template-columns: 1fr 300px;
-		gap: 2rem;
-		align-items: start;
-	}
-
-	.section {
-		background: white;
-		border: 1px solid #e1e5e9;
-		border-radius: 8px;
-		padding: 2rem;
+	.analysis-section,
+	.labels-section {
 		margin-bottom: 2rem;
 	}
 
-	.section h2 {
-		margin: 0 0 1.5rem 0;
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: #1a1a1a;
-	}
-
-	.issue-body {
-		margin-bottom: 1.5rem;
-	}
-
-	.description-text {
-		white-space: pre-wrap;
-		line-height: 1.6;
-		color: #333;
-		margin: 0;
-		font-family: inherit;
-		background: #f8f9fa;
-		padding: 1rem;
-		border-radius: 6px;
-		border: 1px solid #e1e5e9;
-	}
-
-	.no-description {
-		color: #666;
-		font-style: italic;
-		margin: 0;
-	}
-
-	.implementation-guide {
-		background: #f8f9fa;
-		border: 1px solid #e1e5e9;
-		border-radius: 6px;
-		padding: 1.5rem;
-	}
-
-	.guide-text {
-		white-space: pre-wrap;
-		line-height: 1.6;
-		color: #333;
-		margin: 0;
-		font-family: inherit;
-	}
-
-	.github-btn {
-		background: #24292f;
-		color: white;
-		border: none;
-		padding: 0.5rem 1rem;
-		border-radius: 6px;
-		font-size: 0.875rem;
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
-
-	.github-btn:hover {
-		background: #1c2128;
-	}
-
-	.sidebar {
+	.analysis-row {
 		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
-	}
-
-	.analysis-card,
-	.labels-card,
-	.repo-card {
-		background: white;
-		border: 1px solid #e1e5e9;
-		border-radius: 8px;
-		padding: 1.5rem;
-	}
-
-	.analysis-card h3,
-	.labels-card h3,
-	.repo-card h3 {
-		margin: 0 0 1rem 0;
-		font-size: 1.1rem;
-		font-weight: 600;
-		color: #1a1a1a;
-	}
-
-	.analysis-item {
+		flex-wrap: wrap;
+		gap: 2rem;
+		align-items: flex-start;
 		margin-bottom: 1rem;
 	}
 
-	.analysis-item:last-child {
+	.analysis-row:last-child {
 		margin-bottom: 0;
 	}
 
-	.analysis-label {
-		display: block;
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: #666;
-		margin-bottom: 0.5rem;
+	.summary-item {
+		flex: 1;
+		min-width: 100%;
+	}
+
+	section {
+		margin-bottom: 2rem;
+	}
+
+	h2 {
+		color: var(--acc-1);
+		margin: 0 0 1rem 0;
+	}
+
+	h4 {
+		margin: 0 0 0.75rem 0;
+	}
+
+	.issue-body,
+	.implementation-guide {
+		border: 1px solid var(--bg-3);
+		padding: 1.5rem;
+	}
+
+	.issue-body :global(*:first-child) {
+		margin-top: 0;
+	}
+
+	.issue-body :global(code) {
+		background: var(--bg-2);
+		border: 1px solid var(--bg-3);
+		font-family: 'DM Mono', monospace;
+		padding: 0.125rem 0.25rem;
+	}
+
+	.issue-body :global(pre) {
+		background: var(--bg-2);
+		border: 1px solid var(--bg-3);
+		padding: 0.5rem 0.75rem;
+		overflow-x: auto;
+	}
+
+	.issue-body :global(pre code) {
+		border: none;
+	}
+
+	.implementation-guide pre {
+		white-space: pre-wrap;
+		margin: 0;
+		font-family: inherit;
 	}
 
 	.difficulty-badge {
-		color: white;
-		padding: 0.25rem 0.75rem;
-		border-radius: 12px;
-		font-size: 0.75rem;
-		font-weight: 600;
-		text-transform: capitalize;
 		display: inline-block;
-	}
-
-	.time-estimate {
-		color: #666;
-		font-size: 0.9rem;
-		display: flex;
-		align-items: center;
-		gap: 0.25rem;
-	}
-
-	.topics {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	.topic-tag {
-		background: #f1f3f4;
-		color: #5f6368;
 		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		font-size: 0.75rem;
-		font-weight: 500;
 	}
 
-	.summary-text {
-		color: #666;
-		margin: 0;
-		line-height: 1.5;
-		font-size: 0.9rem;
-	}
-
+	.topics,
 	.labels {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.5rem;
 	}
 
+	.topic-tag,
 	.label-tag {
+		border: 1px solid var(--bg-3);
+		color: var(--txt-2);
 		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		font-size: 0.75rem;
-		font-weight: 500;
 	}
 
-	.repo-name {
-		font-weight: 600;
-		color: #007acc;
-		margin-bottom: 0.5rem;
-	}
-
-	.repo-description {
-		color: #666;
-		margin: 0 0 1rem 0;
-		line-height: 1.5;
-		font-size: 0.9rem;
-	}
-
-	.language-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.25rem;
-	}
-
-	.language-tag {
-		background: #e1e5e9;
-		color: #5f6368;
-		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		font-size: 0.75rem;
-		font-weight: 500;
-	}
-
-	/* Responsive design */
-	@media (max-width: 968px) {
-		.content-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.sidebar {
-			order: -1;
-		}
+	.summary {
+		color: var(--txt-1);
+		margin: 0;
 	}
 
 	@media (max-width: 768px) {
-		.container {
-			padding: 1rem;
+		.header {
+			flex-direction: column;
+			align-items: stretch;
 		}
 
-		.section {
-			padding: 1.5rem;
+		.analysis-row {
+			flex-direction: column;
+			gap: 1rem;
 		}
 
-		.analysis-card,
-		.labels-card,
-		.repo-card {
-			padding: 1rem;
-		}
-
-		.issue-title {
-			font-size: 1.5rem;
-		}
-
-		.issue-info {
-			flex-wrap: wrap;
-			gap: 0.5rem;
+		.summary-item {
+			min-width: auto;
 		}
 	}
 </style>

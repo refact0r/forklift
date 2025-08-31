@@ -132,3 +132,26 @@ input::placeholder {
 		border-color: var(--acc-1);
 	}
 }
+
+.difficulty-badge {
+	display: inline-block;
+	padding: 0.125rem 0.25rem;
+	background-color: var(--bg-2);
+	border: 1px solid var(--bg-3);
+
+	&.easy {
+		background: var(--green);
+		border-color: var(--green);
+		color: var(--bg-1);
+	}
+	&.medium {
+		background: var(--acc-1);
+		border-color: var(--acc-1);
+		color: var(--bg-1);
+	}
+	&.hard {
+		background: var(--red);
+		border-color: var(--red);
+		color: var(--bg-1);
+	}
+}

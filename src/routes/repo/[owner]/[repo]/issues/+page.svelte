@@ -16,19 +16,6 @@
 			window.open(issue.html_url, '_blank');
 		}
 	}
-
-	function getDifficultyColor(difficulty) {
-		switch (difficulty?.toLowerCase()) {
-			case 'easy':
-				return 'var(--green)';
-			case 'medium':
-				return 'var(--acc-1)';
-			case 'hard':
-				return 'var(--red)';
-			default:
-				return 'var(--txt-3)';
-		}
-	}
 </script>
 
 {#if error}
@@ -46,10 +33,6 @@
 		</p>
 	</div>
 {:else}
-	<div class="issues-header">
-		<h2>{issues.length} open issue{issues.length === 1 ? '' : 's'}</h2>
-	</div>
-
 	<div class="issues-list">
 		{#each issues as issue}
 			<div
@@ -62,14 +45,10 @@
 				}}
 			>
 				<div class="issue-header">
-					<span class="issue-number">#{issue.number}</span>
-					<span
-						class="difficulty-badge"
-						style="color: {getDifficultyColor(issue.ai_analysis?.difficulty)}"
-					>
+					<span class="difficulty-badge {issue.ai_analysis?.difficulty}">
 						{issue.ai_analysis?.difficulty || 'unknown'}
 					</span>
-
+					<span class="issue-number">#{issue.number}</span>
 					{#if issue.ai_analysis?.topics && issue.ai_analysis.topics.length > 0}
 						<div class="topics">
 							{#each issue.ai_analysis.topics.slice(0, 4) as topic}
@@ -85,7 +64,7 @@
 					<p class="issue-summary">{issue.ai_analysis.summary}</p>
 				{/if}
 
-				<div class="issue-actions">
+				<!-- <div class="issue-actions">
 					<span class="view-btn">view details</span>
 					<button
 						class="github-btn"
@@ -96,7 +75,7 @@
 					>
 						github
 					</button>
-				</div>
+				</div> -->
 			</div>
 		{/each}
 	</div>
@@ -148,7 +127,7 @@
 
 	.issue-title {
 		margin: 0 0 1rem 0;
-		color: var(--txt-0);
+		color: var(--acc-1);
 	}
 
 	.topics {
@@ -163,7 +142,7 @@
 	}
 
 	.issue-summary {
-		margin: 0 0 1rem 0;
+		margin: 0;
 	}
 
 	.issue-actions {
@@ -174,7 +153,6 @@
 	}
 
 	.view-btn {
-		color: var(--acc-1);
 	}
 
 	.github-btn {

@@ -30,8 +30,7 @@ export async function GET({ fetch, url }) {
 		const topSkills = userSkills.slice(0, 3);
 
 		const headers = {
-			Accept: 'application/vnd.github.v3+json',
-			'User-Agent': 'SvelteKit-Open-Source-Helper'
+			Accept: 'application/vnd.github.v3+json'
 		};
 
 		if (GITHUB_TOKEN) {
@@ -43,7 +42,7 @@ export async function GET({ fetch, url }) {
 		const apiUrl = `https://api.github.com/search/repositories?q=${encodeURIComponent(fullQuery)}&sort=stars&order=desc&per_page=30`;
 
 		const response = await fetch(apiUrl, { headers });
-		
+
 		if (!response.ok) {
 			const errorText = await response.text();
 			console.error('GitHub API error:', response.status, errorText);

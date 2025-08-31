@@ -64,10 +64,10 @@
 						>
 							{#if isSaved}
 								<BookmarkIcon />
-								Saved
+								saved
 							{:else}
 								<BookmarkSimpleIcon />
-								add to list
+								bookmark
 							{/if}
 						</button>
 					{/if}
@@ -76,7 +76,7 @@
 						target="_blank"
 						class="button accent github-button"
 					>
-						view on github
+						github
 					</a>
 				</div>
 			</div>
@@ -140,11 +140,8 @@
 
 	.save-button {
 		display: flex;
-		align-items: center;
 		gap: 0.5rem;
 		margin: 0;
-		min-width: 150px;
-		justify-content: center;
 	}
 
 	.save-button:disabled {

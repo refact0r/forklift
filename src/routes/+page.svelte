@@ -59,23 +59,23 @@
 			name: 'Roo-Code',
 			fullName: 'RooCodeInc/Roo-Code',
 			description: 'Roo Code gives you a whole dev team of AI agents in your code editor.',
-			stars: 19100,
-			forks: 2100,
+			stars: 19135,
+			forks: 2131,
 			language: 'TypeScript',
-			topics: ['ai', 'code-editor', 'developer-tools', 'vscode-extension'],
+			topics: [],
 			openIssues: 398,
-			updatedAt: '2025-01-27T12:00:00Z'
+			updatedAt: '2025-08-30T12:00:00Z'
 		},
 		{
 			owner: 'microsoft',
 			name: 'vscode',
 			fullName: 'microsoft/vscode',
 			description: 'Visual Studio Code',
-			stars: 162000,
-			forks: 28500,
+			stars: 176000,
+			forks: 34700,
 			language: 'TypeScript',
 			topics: [],
-			openIssues: 5200,
+			openIssues: 12325,
 			updatedAt: '2025-08-30T08:15:00Z'
 		},
 		{
@@ -83,11 +83,11 @@
 			name: 'node',
 			fullName: 'nodejs/node',
 			description: 'Node.js JavaScript runtime',
-			stars: 106000,
-			forks: 28800,
+			stars: 113000,
+			forks: 32900,
 			language: 'JavaScript',
 			topics: [],
-			openIssues: 1650,
+			openIssues: 1730,
 			updatedAt: '2025-08-29T16:45:00Z'
 		},
 		{
@@ -95,11 +95,11 @@
 			name: 'next.js',
 			fullName: 'vercel/next.js',
 			description: 'The React Framework for the Web',
-			stars: 124000,
-			forks: 26400,
+			stars: 134000,
+			forks: 29200,
 			language: 'JavaScript',
 			topics: [],
-			openIssues: 2100,
+			openIssues: 2305,
 			updatedAt: '2025-08-30T12:20:00Z'
 		}
 	];

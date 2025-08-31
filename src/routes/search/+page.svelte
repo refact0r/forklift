@@ -71,6 +71,7 @@
 	h1 {
 		margin: 0;
 		font-size: 2.5rem;
+		color: var(--acc-1);
 	}
 
 	.search-container {
