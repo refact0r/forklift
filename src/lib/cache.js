@@ -28,7 +28,7 @@ export async function getFromCache(key) {
 	try {
 		const client = await getRedisClient();
 		const data = await client.get(key);
-		
+
 		if (!data) {
 			return null;
 		}
@@ -86,7 +86,7 @@ export function generateCacheKey(prefix, ...parts) {
  * @param {number} ttlSeconds - TTL in seconds
  * @returns {Promise<any>} - Cached or fresh data
  */
-export async function cacheWrapper(key, fetchFunction, ttlSeconds = 3600) {
+export async function cacheWrapper(key, fetchFunction, ttlSeconds = 10800) {
 	// Try to get from cache first
 	const cachedData = await getFromCache(key);
 	if (cachedData !== null) {
@@ -98,10 +98,10 @@ export async function cacheWrapper(key, fetchFunction, ttlSeconds = 3600) {
 	console.log(`Cache miss: ${key}`);
 	try {
 		const freshData = await fetchFunction();
-		
+
 		// Cache the result
 		await setCache(key, freshData, ttlSeconds);
-		
+
 		return freshData;
 	} catch (error) {
 		console.error(`Error in cache wrapper for key ${key}:`, error);
