@@ -196,7 +196,7 @@
 		</div>
 
 		<div class="section">
-			<h3>your skills ({languages.length}/15)</h3>
+			<h2>your skills ({languages.length}/15)</h2>
 			<p class="section-description">
 				add programming languages, frameworks, and tools you're familiar with or interested in
 				learning
@@ -224,46 +224,44 @@
 				</div>
 			{/if}
 
-			<div class="add-language">
-				<div class="input-group">
-					<div class="input-wrapper">
-						<input
-							type="text"
-							bind:value={newLanguage}
-							onkeydown={handleKeydown}
-							oninput={handleInput}
-							placeholder="Enter a skill (e.g. python, flask, sveltekit)..."
-							disabled={saving}
-							autocomplete="off"
-						/>
-						{#if showSuggestions && filteredSuggestions.length > 0}
-							<div class="suggestions-dropdown">
-								{#each filteredSuggestions as suggestion, index}
-									<button
-										class="suggestion-item"
-										class:selected={index === selectedSuggestionIndex}
-										onclick={() => selectSuggestion(suggestion)}
-									>
-										{suggestion}
-									</button>
-								{/each}
-							</div>
-						{/if}
-					</div>
-					<button
-						class="add-btn accent"
-						onclick={addLanguage}
-						disabled={saving || !newLanguage.trim() || languages.length >= 15}
-					>
-						<PlusIcon />
-						add
-					</button>
+			<div class="input-group">
+				<div class="input-wrapper">
+					<input
+						type="text"
+						bind:value={newLanguage}
+						onkeydown={handleKeydown}
+						oninput={handleInput}
+						placeholder="Enter a skill (e.g. python, flask, sveltekit)..."
+						disabled={saving}
+						autocomplete="off"
+					/>
+					{#if showSuggestions && filteredSuggestions.length > 0}
+						<div class="suggestions-dropdown">
+							{#each filteredSuggestions as suggestion, index}
+								<button
+									class="suggestion-item"
+									class:selected={index === selectedSuggestionIndex}
+									onclick={() => selectSuggestion(suggestion)}
+								>
+									{suggestion}
+								</button>
+							{/each}
+						</div>
+					{/if}
 				</div>
+				<button
+					class="add-btn accent"
+					onclick={addLanguage}
+					disabled={saving || !newLanguage.trim() || languages.length >= 15}
+				>
+					<PlusIcon />
+					add
+				</button>
 			</div>
 		</div>
 
 		<div class="section">
-			<h3>my list</h3>
+			<h2>my list</h2>
 			<p class="section-description">repositories you've saved for later</p>
 
 			{#if savedRepos.savedRepos.length > 0}
@@ -323,8 +321,8 @@
 
 	.profile-header h1 {
 		margin: 0 0 0.5rem 0;
-		font-size: 2.5rem;
 		color: var(--acc-1);
+		font-size: 2.5rem;
 	}
 
 	.profile-header p {
@@ -337,9 +335,8 @@
 		margin-bottom: 2rem;
 	}
 
-	.section h3 {
+	.section h2 {
 		margin: 0 0 0.5rem 0;
-		font-size: 1.5rem;
 	}
 
 	.section-description {
@@ -347,60 +344,53 @@
 		color: var(--txt-2);
 	}
 
-	.language-tags {
+	.input-group {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.75rem;
-		margin-bottom: 1.5rem;
+		gap: 1rem;
 	}
 
-	.language-tag {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		transition: all 0.2s;
+	.input-wrapper {
+		position: relative;
+		width: 100%;
+		padding: 0.75rem;
+		background: var(--bg-2);
+		border: 1px solid var(--bg-3);
 	}
 
-	.language-tag:hover {
-		border-color: var(--acc-1);
-	}
-
-	.language-name {
-		color: var(--acc-1);
-		font-size: 0.875rem;
-	}
-
-	.remove-btn {
-		background: transparent;
-		border: none;
-		color: var(--txt-3);
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		padding: 0.125rem;
-		transition: all 0.2s;
-		opacity: 0;
-	}
-
-	.language-tag:hover .remove-btn {
-		opacity: 1;
-	}
-
-	.remove-btn:hover {
-		background: var(--bg-3);
+	.input-group input {
+		width: 100%;
 		color: var(--txt-1);
 	}
 
-	.remove-btn :global(.icon) {
+	.input-wrapper:focus-within {
+		outline: none;
+		border-color: var(--acc-1);
+	}
+
+	.language-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.language-tag {
+		padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+		border: 1px solid var(--bg-3);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.language-name {
 		font-size: 0.875rem;
 	}
 
 	.empty-state {
-		background: var(--bg-2);
 		border: 1px dashed var(--bg-3);
 		padding: 2rem;
 		text-align: center;
-		margin-bottom: 1.5rem;
+		margin-bottom: 1rem;
 	}
 
 	.empty-state p {
@@ -408,32 +398,22 @@
 		color: var(--txt-2);
 	}
 
-	.add-language {
-		max-width: 600px;
-	}
-
-	.input-group {
+	.remove-btn {
+		background: none;
+		border: none;
+		color: var(--txt-2);
+		cursor: pointer;
 		display: flex;
-		gap: 0.75rem;
+		align-items: center;
+		padding: 0.125rem;
 	}
 
-	.input-wrapper {
-		position: relative;
-		flex: 1;
-	}
-
-	.input-group input {
-		width: 100%;
-		padding: 0.75rem;
-		border: 1px solid var(--bg-3);
-		background: var(--bg-1);
+	.remove-btn:hover {
 		color: var(--txt-1);
-		font-size: 0.875rem;
 	}
 
-	.input-group input:focus {
-		outline: none;
-		border-color: var(--acc-1);
+	.remove-btn :global(.icon) {
+		font-size: 0.875rem;
 	}
 
 	.add-btn {
@@ -476,15 +456,14 @@
 		position: absolute;
 		top: 0.75rem;
 		right: 0.75rem;
-		background: var(--bg-1);
+		background: var(--bg-2);
 		border: 1px solid var(--bg-3);
-		color: var(--txt-3);
+		color: var(--txt-2);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: 0.5rem;
-		transition: all 0.2s;
 		opacity: 0;
 	}
 
@@ -493,8 +472,7 @@
 	}
 
 	.unsave-button:hover {
-		background: var(--bg-2);
-		border-color: var(--acc-1);
+		background: var(--bg-3);
 		color: var(--txt-1);
 	}
 
@@ -514,16 +492,16 @@
 
 	.suggestions-dropdown {
 		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
+		top: calc(100% + 1px);
+		left: -1px;
+		right: -1px;
 		background: var(--bg-1);
 		border: 1px solid var(--bg-3);
 		border-top: none;
-		max-height: 200px;
+		max-height: calc(8 * 43px);
 		overflow-y: auto;
 		z-index: 1000;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 10px 10px 2px rgba(0, 0, 0, 0.2);
 	}
 
 	.suggestion-item {
@@ -536,8 +514,7 @@
 		color: var(--txt-1);
 		cursor: pointer;
 		font-size: 0.875rem;
-		transition: background-color 0.15s ease;
-		border-bottom: 1px solid var(--bg-2);
+		border-bottom: 1px solid var(--bg-3);
 	}
 
 	.suggestion-item:last-child {
@@ -552,6 +529,6 @@
 
 	.suggestion-item.selected {
 		background: var(--acc-1);
-		color: white;
+		color: var(--bg-1);
 	}
 </style>

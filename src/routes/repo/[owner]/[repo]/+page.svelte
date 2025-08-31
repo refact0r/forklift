@@ -127,7 +127,6 @@
 		border: 1px solid var(--bg-3);
 		padding: 0.5rem 0.75rem;
 		color: var(--txt-1);
-		transition: all 0.2s ease;
 	}
 
 	.tech-tag.highlighted {

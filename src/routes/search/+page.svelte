@@ -79,7 +79,7 @@
 	}
 
 	.search-container {
-		margin-bottom: 3rem;
+		margin-bottom: 2rem;
 	}
 
 	.message {
@@ -98,17 +98,5 @@
 	.results-grid {
 		display: grid;
 		gap: 1rem;
-	}
-
-	/* Responsive design */
-	@media (max-width: 768px) {
-		.content {
-			padding: 1rem;
-		}
-
-		.search-container {
-			flex-direction: column;
-			align-items: stretch;
-		}
 	}
 </style>

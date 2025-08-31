@@ -30,7 +30,11 @@
 	</div>
 
 	{#if repo.description}
-		<p class="repo-description">{repo.description.length > 200 ? repo.description.substring(0, 200) + '...' : repo.description}</p>
+		<p class="repo-description">
+			{repo.description.length > 200
+				? repo.description.substring(0, 200) + '...'
+				: repo.description}
+		</p>
 	{/if}
 
 	<div class="repo-meta" class:small={repo.topics.length === 0}>
@@ -66,7 +70,6 @@
 		border: 1px solid var(--bg-3);
 		padding: 1.5rem;
 		text-align: left;
-		transition: border-color 0.2s;
 		width: 100%;
 		display: flex;
 		flex-direction: column;

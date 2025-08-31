@@ -4,7 +4,7 @@
 	import { auth } from '$lib/auth.svelte.js';
 	import { savedRepos } from '$lib/savedRepos.svelte.js';
 	import RepoCard from '$lib/components/RepoCard.svelte';
-	
+
 	let { data } = $props();
 	let currentFilter = $state('all');
 	let filteredRecommendations = $state([]);
@@ -14,7 +14,7 @@
 	let hasSkills = $derived(data.hasSkills);
 	let userSkills = $derived(data.userSkills);
 	let error = $derived(data.error);
-	
+
 	onMount(async () => {
 		if (!auth.user) {
 			goto('/');
@@ -35,12 +35,14 @@
 
 	// Filter recommendations by skill
 	$effect(() => {
-		filteredRecommendations = currentFilter === 'all' 
-			? recommendations
-			: recommendations.filter(repo => 
-				repo.language?.toLowerCase() === currentFilter.toLowerCase() ||
-				repo.matchedSkill?.toLowerCase() === currentFilter.toLowerCase()
-			);
+		filteredRecommendations =
+			currentFilter === 'all'
+				? recommendations
+				: recommendations.filter(
+						(repo) =>
+							repo.language?.toLowerCase() === currentFilter.toLowerCase() ||
+							repo.matchedSkill?.toLowerCase() === currentFilter.toLowerCase()
+					);
 	});
 
 	function handleFilterChange(skill) {
@@ -158,18 +160,17 @@
 
 	.filter-button {
 		font-size: 0.875rem;
-		transition: all 0.2s;
+		color: var(--txt-1);
 	}
 
 	.filter-button:hover {
-		border-color: var(--acc-1);
-		color: var(--txt-1);
+		background: var(--bg-3);
 	}
 
 	.filter-button.active {
 		background: var(--acc-1);
 		border-color: var(--acc-1);
-		color: white;
+		color: var(--bg-1);
 	}
 
 	.recommendations-grid {
