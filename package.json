@@ -31,6 +31,7 @@
 	"dependencies": {
 		"@supabase/supabase-js": "^2.56.1",
 		"marked": "^16.2.1",
-		"openai": "^5.16.0"
+		"openai": "^5.16.0",
+		"redis": "^5.8.2"
 	}
 }

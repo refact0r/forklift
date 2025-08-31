@@ -1,6 +1,7 @@
 import { OPENAI_API_KEY } from '$env/static/private';
 import { json } from '@sveltejs/kit';
 import OpenAI from 'openai';
+import { cacheWrapper, generateCacheKey } from '$lib/cache.js';
 
 const openai = new OpenAI({
 	apiKey: OPENAI_API_KEY
@@ -122,12 +123,27 @@ export async function POST({ request }) {
 			return json({ success: false, error: 'Invalid request data' }, { status: 400 });
 		}
 
-		const classifiedIssues = await classifyIssues(repoContext, issues);
+		// Create cache key based on repository and issue numbers
+		const issueNumbers = issues
+			.map((issue) => issue.number)
+			.sort()
+			.join(',');
+		const cacheKey = generateCacheKey('classify', repoContext.full_name, issueNumbers);
 
-		return json({
-			success: true,
-			issues: classifiedIssues
-		});
+		// Use cache wrapper for AI classification
+		const result = await cacheWrapper(
+			cacheKey,
+			async () => {
+				const classifiedIssues = await classifyIssues(repoContext, issues);
+				return {
+					success: true,
+					issues: classifiedIssues
+				};
+			},
+			3600 // Cache issue classification for 1 hour
+		);
+
+		return json(result);
 	} catch (error) {
 		console.error('Classification API error:', error);
 		return json({ success: false, error: 'Classification failed' }, { status: 500 });

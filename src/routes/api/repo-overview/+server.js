@@ -1,6 +1,7 @@
 import { OPENAI_API_KEY } from '$env/static/private';
 import { json } from '@sveltejs/kit';
 import OpenAI from 'openai';
+import { cacheWrapper, generateCacheKey } from '$lib/cache.js';
 
 const openai = new OpenAI({
 	apiKey: OPENAI_API_KEY
@@ -17,12 +18,24 @@ export async function POST({ request }) {
 			throw new Error('OpenAI API key not configured');
 		}
 
-		// Prepare data for LLM processing
-		const packageInfo = Object.entries(repoData.packageFiles || {})
-			.map(([filename, content]) => `${filename}: ${content?.slice(0, 200)}...`)
-			.join('\n');
+		// Create cache key based on repository and content
+		const cacheKey = generateCacheKey(
+			'overview',
+			repoData.full_name,
+			JSON.stringify(repoData.languages),
+			repoData.readme?.slice(0, 100) || 'no-readme'
+		);
 
-		const prompt = `You are a repository onboarding assistant that helps newcomers understand GitHub repositories. Generate 3 sections based on the repository data below. 
+		// Use cache wrapper for OpenAI response
+		const result = await cacheWrapper(
+			cacheKey,
+			async () => {
+				// Prepare data for LLM processing
+				const packageInfo = Object.entries(repoData.packageFiles || {})
+					.map(([filename, content]) => `${filename}: ${content?.slice(0, 200)}...`)
+					.join('\n');
+
+				const prompt = `You are a repository onboarding assistant that helps newcomers understand GitHub repositories. Generate 3 sections based on the repository data below. 
 
 1. quick_context: Human-readable summary (what/who/why the project exists).
 2. project_landscape: Two concise, comma separated list of languages and frameworks/tools needed.
@@ -56,26 +69,31 @@ ${repoData.readme?.slice(0, 10000) || 'No README available'}
 PACKAGE FILES:
 ${packageInfo || 'No package files found'}`;
 
-		// Call OpenAI using the modern responses API
-		const response = await openai.responses.create({
-			model: 'gpt-5-nano',
-			input: prompt
-		});
+				// Call OpenAI using the modern responses API
+				const response = await openai.responses.create({
+					model: 'gpt-5-nano',
+					input: prompt
+				});
 
-		if (response.status !== 'completed') {
-			throw new Error(`OpenAI response not completed: ${response.status}`);
-		}
+				if (response.status !== 'completed') {
+					throw new Error(`OpenAI response not completed: ${response.status}`);
+				}
 
-		// Extract text content from the response
-		const content = response.output_text;
+				// Extract text content from the response
+				const content = response.output_text;
 
-		// Parse the JSON response - if this fails, it'll be caught by the outer try-catch
-		const parsedContent = JSON.parse(content);
+				// Parse the JSON response - if this fails, it'll be caught by the outer try-catch
+				const parsedContent = JSON.parse(content);
 
-		return json({
-			success: true,
-			overview: parsedContent
-		});
+				return {
+					success: true,
+					overview: parsedContent
+				};
+			},
+			7200 // Cache AI analysis for 2 hours
+		);
+
+		return json(result);
 	} catch (error) {
 		console.error('Error generating repo overview:', error);
 

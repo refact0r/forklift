@@ -63,7 +63,7 @@
 					<h4>labels</h4>
 					<div class="labels">
 						{#each data.issue.labels as label}
-							<span class="label-tag">{label.name}</span>
+							<span class="label-tag">{label}</span>
 						{/each}
 					</div>
 				</div>

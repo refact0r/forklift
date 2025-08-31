@@ -1,5 +1,6 @@
 import { GITHUB_TOKEN } from '$env/static/private';
 import { json } from '@sveltejs/kit';
+import { cacheWrapper, generateCacheKey } from '$lib/cache.js';
 
 export async function GET({ fetch, url }) {
 	// Get user skills from query parameters
@@ -26,100 +27,112 @@ export async function GET({ fetch, url }) {
 			});
 		}
 
-		// Build GitHub API queries based on user skills (limit to first 3 skills for faster loading)
-		const topSkills = userSkills.slice(0, 3);
+		// Create cache key based on user skills
+		const cacheKey = generateCacheKey('recommendations', userSkills.sort().join(','));
 
-		const headers = {
-			Accept: 'application/vnd.github.v3+json'
-		};
+		// Use cache wrapper to get recommendations
+		const result = await cacheWrapper(
+			cacheKey,
+			async () => {
+				// Build GitHub API queries based on user skills (limit to first 3 skills for faster loading)
+				const topSkills = userSkills.slice(0, 3);
 
-		if (GITHUB_TOKEN) {
-			headers.Authorization = `token ${GITHUB_TOKEN}`;
-		}
+				const headers = {
+					Accept: 'application/vnd.github.v3+json'
+				};
 
-		// Create topic-based search query - much more flexible
-		const fullQuery = topSkills.join(' OR ') + ' stars:>10';
-		const apiUrl = `https://api.github.com/search/repositories?q=${encodeURIComponent(fullQuery)}&sort=stars&order=desc&per_page=30`;
+				if (GITHUB_TOKEN) {
+					headers.Authorization = `token ${GITHUB_TOKEN}`;
+				}
 
-		const response = await fetch(apiUrl, { headers });
+				// Create topic-based search query - much more flexible
+				const fullQuery = topSkills.join(' OR ') + ' stars:>10';
+				const apiUrl = `https://api.github.com/search/repositories?q=${encodeURIComponent(fullQuery)}&sort=stars&order=desc&per_page=30`;
 
-		if (!response.ok) {
-			const errorText = await response.text();
-			console.error('GitHub API error:', response.status, errorText);
-			throw new Error(`Search failed: ${response.status} - ${errorText}`);
-		}
+				const response = await fetch(apiUrl, { headers });
 
-		const data = await response.json();
-		const allRepos = data.items.map((repo) => ({
-			id: repo.id,
-			name: repo.name,
-			fullName: repo.full_name,
-			owner: repo.owner.login,
-			description: repo.description,
-			stars: repo.stargazers_count,
-			forks: repo.forks_count,
-			language: repo.language,
-			topics: repo.topics || [],
-			openIssues: repo.open_issues_count,
-			updatedAt: repo.updated_at,
-			url: repo.html_url,
-			matchedSkill:
-				userSkills.find(
-					(skill) =>
-						// Check if skill matches language exactly
-						skill.toLowerCase() === repo.language?.toLowerCase() ||
-						// Check if skill appears in repo name, description, or topics
-						repo.name.toLowerCase().includes(skill.toLowerCase()) ||
-						repo.description?.toLowerCase().includes(skill.toLowerCase()) ||
-						repo.topics.some((topic) => topic.toLowerCase().includes(skill.toLowerCase()))
-				) || repo.language
-		}));
+				if (!response.ok) {
+					const errorText = await response.text();
+					console.error('GitHub API error:', response.status, errorText);
+					throw new Error(`Search failed: ${response.status} - ${errorText}`);
+				}
 
-		// Remove duplicates
-		const uniqueRepos = allRepos.filter((repo, index, self) => {
-			return index === self.findIndex((r) => r.fullName === repo.fullName);
-		});
+				const data = await response.json();
+				const allRepos = data.items.map((repo) => ({
+					id: repo.id,
+					name: repo.name,
+					fullName: repo.full_name,
+					owner: repo.owner.login,
+					description: repo.description,
+					stars: repo.stargazers_count,
+					forks: repo.forks_count,
+					language: repo.language,
+					topics: repo.topics || [],
+					openIssues: repo.open_issues_count,
+					updatedAt: repo.updated_at,
+					url: repo.html_url,
+					matchedSkill:
+						userSkills.find(
+							(skill) =>
+								// Check if skill matches language exactly
+								skill.toLowerCase() === repo.language?.toLowerCase() ||
+								// Check if skill appears in repo name, description, or topics
+								repo.name.toLowerCase().includes(skill.toLowerCase()) ||
+								repo.description?.toLowerCase().includes(skill.toLowerCase()) ||
+								repo.topics.some((topic) => topic.toLowerCase().includes(skill.toLowerCase()))
+						) || repo.language
+				}));
 
-		// Score and sort repos
-		const scoredRepos = uniqueRepos.map((repo) => {
-			let score = 0;
+				// Remove duplicates
+				const uniqueRepos = allRepos.filter((repo, index, self) => {
+					return index === self.findIndex((r) => r.fullName === repo.fullName);
+				});
 
-			// Skill match bonus
-			if (
-				userSkills.some(
-					(skill) =>
-						skill.toLowerCase() === repo.language?.toLowerCase() ||
-						repo.topics.some((topic) => topic.toLowerCase().includes(skill.toLowerCase()))
-				)
-			) {
-				score += 3;
-			}
+				// Score and sort repos
+				const scoredRepos = uniqueRepos.map((repo) => {
+					let score = 0;
 
-			// Activity bonus (recent commits)
-			const lastUpdate = new Date(repo.updatedAt);
-			const daysSinceUpdate = (Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24);
-			if (daysSinceUpdate < 30) score += 2;
-			else if (daysSinceUpdate < 90) score += 1;
+					// Skill match bonus
+					if (
+						userSkills.some(
+							(skill) =>
+								skill.toLowerCase() === repo.language?.toLowerCase() ||
+								repo.topics.some((topic) => topic.toLowerCase().includes(skill.toLowerCase()))
+						)
+					) {
+						score += 3;
+					}
 
-			// Star range bonus (not too popular, not too unknown)
-			if (repo.stars >= 50 && repo.stars <= 1000) score += 2;
-			else if (repo.stars > 1000 && repo.stars <= 5000) score += 1;
+					// Activity bonus (recent commits)
+					const lastUpdate = new Date(repo.updatedAt);
+					const daysSinceUpdate = (Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24);
+					if (daysSinceUpdate < 30) score += 2;
+					else if (daysSinceUpdate < 90) score += 1;
 
-			// Issues bonus
-			if (repo.openIssues > 0) score += 1;
+					// Star range bonus (not too popular, not too unknown)
+					if (repo.stars >= 50 && repo.stars <= 1000) score += 2;
+					else if (repo.stars > 1000 && repo.stars <= 5000) score += 1;
 
-			return { ...repo, score };
-		});
+					// Issues bonus
+					if (repo.openIssues > 0) score += 1;
 
-		// Sort by score and limit to 30
-		const finalRecommendations = scoredRepos.sort((a, b) => b.score - a.score).slice(0, 30);
+					return { ...repo, score };
+				});
 
-		return json({
-			recommendations: finalRecommendations,
-			hasSkills: true,
-			userSkills: userSkills,
-			error: null
-		});
+				// Sort by score and limit to 30
+				const finalRecommendations = scoredRepos.sort((a, b) => b.score - a.score).slice(0, 30);
+
+				return {
+					recommendations: finalRecommendations,
+					hasSkills: true,
+					userSkills: userSkills,
+					error: null
+				};
+			},
+			1800 // Cache recommendations for 30 minutes
+		);
+
+		return json(result);
 	} catch (error) {
 		console.error('Error loading recommendations:', error);
 		return json(
