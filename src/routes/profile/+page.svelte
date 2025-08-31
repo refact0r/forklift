@@ -303,7 +303,7 @@
 			{:else}
 				<div class="empty-state">
 					<p>
-						no saved repositories yet. browse repositories and click "add to my list" to save them
+						no saved repositories yet. browse repositories and click "add to list" to save them
 						here!
 					</p>
 				</div>

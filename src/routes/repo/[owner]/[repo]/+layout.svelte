@@ -67,7 +67,7 @@
 								Saved
 							{:else}
 								<BookmarkSimpleIcon />
-								add to my list
+								add to list
 							{/if}
 						</button>
 					{/if}
@@ -143,6 +143,8 @@
 		align-items: center;
 		gap: 0.5rem;
 		margin: 0;
+		min-width: 150px;
+		justify-content: center;
 	}
 
 	.save-button:disabled {
