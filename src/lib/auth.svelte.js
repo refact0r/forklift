@@ -19,12 +19,12 @@ export const auth = {
 				redirectTo: `${window.location.origin}/`
 			}
 		});
-		
+
 		if (error) {
 			console.error('Error during sign in:', error);
 			return { error };
 		}
-		
+
 		return { error: null };
 	},
 
@@ -40,9 +40,11 @@ export const auth = {
 
 	async initialize() {
 		if (!browser) return;
-		
+
 		// Get initial session
-		const { data: { session } } = await supabase.auth.getSession();
+		const {
+			data: { session }
+		} = await supabase.auth.getSession();
 		user = session?.user ?? null;
 		loading = false;
 

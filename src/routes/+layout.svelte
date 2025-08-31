@@ -37,6 +37,9 @@
 		</a>
 		<a href="/">home</a>
 		<a href="/search">search</a>
+		{#if auth.user}
+			<a href="/for-you">for you</a>
+		{/if}
 	</div>
 
 	<div class="nav-right">
@@ -112,6 +115,7 @@
 
 	.sign-in,
 	.sign-out {
+		/* Add styles if needed */
 	}
 
 	.profile-link {

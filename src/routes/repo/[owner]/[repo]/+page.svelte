@@ -1,5 +1,7 @@
 <script>
 	import { marked } from 'marked';
+	import { isMatchingSkill } from '$lib/skillMatcher.js';
+	import { savedRepos } from '$lib/savedRepos.svelte.js';
 
 	let { data } = $props();
 
@@ -40,7 +42,10 @@
 					<h4>languages</h4>
 					<div class="tech-tags">
 						{#each overview.project_landscape.languages as lang}
-							<span class="tech-tag">{lang}</span>
+							<span
+								class="tech-tag"
+								class:highlighted={isMatchingSkill(lang, savedRepos.userSkills)}>{lang}</span
+							>
 						{/each}
 					</div>
 				</div>
@@ -51,7 +56,10 @@
 					<h4>tools & frameworks</h4>
 					<div class="tech-tags">
 						{#each overview.project_landscape.tools as tool}
-							<span class="tech-tag">{tool}</span>
+							<span
+								class="tech-tag"
+								class:highlighted={isMatchingSkill(tool, savedRepos.userSkills)}>{tool}</span
+							>
 						{/each}
 					</div>
 				</div>
@@ -125,6 +133,12 @@
 		border: 1px solid var(--bg-3);
 		padding: 0.5rem 0.75rem;
 		color: var(--txt-1);
+		transition: all 0.2s ease;
+	}
+
+	.tech-tag.highlighted {
+		border-color: var(--acc-1);
+		font-weight: 800;
 	}
 
 	.onboarding-content {

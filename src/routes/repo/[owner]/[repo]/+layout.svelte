@@ -1,11 +1,48 @@
 <script>
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 	import StarIcon from '~icons/ph/star';
 	import ForkIcon from '~icons/ph/git-fork';
+	import BookmarkIcon from '~icons/ph/bookmark';
+	import BookmarkSimpleIcon from '~icons/ph/bookmark-simple';
+	import { auth } from '$lib/auth.svelte.js';
+	import { savedRepos } from '$lib/savedRepos.svelte.js';
 
 	let { data, children } = $props();
 
 	const { owner, repo, repoData, error } = data;
+	let saving = $state(false);
+
+	onMount(async () => {
+		if (auth.user) {
+			await savedRepos.loadSavedRepos();
+			await savedRepos.loadUserSkills();
+		}
+	});
+
+	async function toggleSaved() {
+		if (!auth.user || saving) return;
+
+		saving = true;
+		const isCurrentlySaved = savedRepos.isRepoSaved(owner, repo);
+
+		if (isCurrentlySaved) {
+			await savedRepos.unsaveRepo(owner, repo);
+		} else {
+			await savedRepos.saveRepo({
+				owner,
+				name: repo,
+				full_name: repoData.full_name,
+				description: repoData.description,
+				stargazers_count: repoData.stars,
+				language: repoData.language
+			});
+		}
+
+		saving = false;
+	}
+
+	const isSaved = $derived(savedRepos.isRepoSaved(owner, repo));
 </script>
 
 <div class="content">
@@ -18,13 +55,30 @@
 		<div class="repo-header">
 			<div class="header-top">
 				<h1>{repoData.full_name}</h1>
-				<a
-					href="https://github.com/{owner}/{repo}"
-					target="_blank"
-					class="button accent github-button"
-				>
-					view on github
-				</a>
+				<div class="header-buttons">
+					{#if auth.user}
+						<button
+							class="button {isSaved ? 'accent' : 'secondary'} save-button"
+							onclick={toggleSaved}
+							disabled={saving}
+						>
+							{#if isSaved}
+								<BookmarkIcon />
+								Saved
+							{:else}
+								<BookmarkSimpleIcon />
+								Add to My List
+							{/if}
+						</button>
+					{/if}
+					<a
+						href="https://github.com/{owner}/{repo}"
+						target="_blank"
+						class="button accent github-button"
+					>
+						view on github
+					</a>
+				</div>
 			</div>
 			<p class="repo-description">{repoData.description}</p>
 			<div class="repo-stats">
@@ -76,6 +130,24 @@
 		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 1rem;
+	}
+
+	.header-buttons {
+		display: flex;
+		gap: 0.75rem;
+		align-items: center;
+	}
+
+	.save-button {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin: 0;
+	}
+
+	.save-button:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 
 	.github-button {

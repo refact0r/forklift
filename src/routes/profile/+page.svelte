@@ -5,11 +5,19 @@
 	import XIcon from '~icons/ph/x';
 	import { auth } from '$lib/auth.svelte.js';
 	import { supabase } from '$lib/supabase.js';
+	import { savedRepos } from '$lib/savedRepos.svelte.js';
+	import RepoCard from '$lib/components/RepoCard.svelte';
+	import { COMMON_SKILLS } from '$lib/commonSkills.js';
 
 	let languages = $state([]);
 	let newLanguage = $state('');
 	let loading = $state(true);
 	let saving = $state(false);
+	let displayLimit = $state(10);
+	let loadingMore = $state(false);
+	let showSuggestions = $state(false);
+	let filteredSuggestions = $state([]);
+	let selectedSuggestionIndex = $state(-1);
 
 	onMount(async () => {
 		// Redirect if not authenticated
@@ -17,9 +25,18 @@
 			goto('/');
 			return;
 		}
-		
+
 		await loadLanguages();
+		await savedRepos.loadSavedRepos();
+		await savedRepos.loadUserSkills();
 		loading = false;
+
+		// Add click outside listener
+		document.addEventListener('click', handleClickOutside);
+
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
 	});
 
 	async function loadLanguages() {
@@ -34,13 +51,20 @@
 		if (error) {
 			console.error('Error loading languages:', error);
 		} else {
-			languages = data.map(item => item.language);
+			languages = data.map((item) => item.language);
 		}
 	}
 
 	async function addLanguage() {
 		const language = newLanguage.trim();
 		if (!language || !auth.user || languages.includes(language)) {
+			newLanguage = '';
+			return;
+		}
+
+		// Limit to 15 skills maximum
+		if (languages.length >= 15) {
+			alert('Maximum 15 skills allowed');
 			newLanguage = '';
 			return;
 		}
@@ -55,6 +79,8 @@
 		} else {
 			languages = [...languages, language];
 			newLanguage = '';
+			// Update skills in savedRepos manager too
+			await savedRepos.loadUserSkills();
 		}
 		saving = false;
 	}
@@ -72,15 +98,85 @@
 		if (error) {
 			console.error('Error removing language:', error);
 		} else {
-			languages = languages.filter(lang => lang !== languageToRemove);
+			languages = languages.filter((lang) => lang !== languageToRemove);
+			// Update skills in savedRepos manager too
+			await savedRepos.loadUserSkills();
 		}
 		saving = false;
 	}
 
-	function handleKeydown(event) {
-		if (event.key === 'Enter') {
-			addLanguage();
+	function handleInput() {
+		const query = newLanguage.trim();
+
+		if (query.length === 0) {
+			showSuggestions = false;
+			filteredSuggestions = [];
+			return;
 		}
+
+		// Filter suggestions based on input
+		const suggestions = COMMON_SKILLS.filter(
+			(skill) => skill.toLowerCase().includes(query.toLowerCase()) && !languages.includes(skill)
+		).slice(0, 8); // Show max 8 suggestions
+
+		filteredSuggestions = suggestions;
+		showSuggestions = suggestions.length > 0;
+		selectedSuggestionIndex = -1;
+	}
+
+	function handleKeydown(event) {
+		if (!showSuggestions) {
+			if (event.key === 'Enter') {
+				addLanguage();
+			}
+			return;
+		}
+
+		// Handle suggestion navigation
+		if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			selectedSuggestionIndex = Math.min(
+				selectedSuggestionIndex + 1,
+				filteredSuggestions.length - 1
+			);
+		} else if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+		} else if (event.key === 'Enter') {
+			event.preventDefault();
+			if (selectedSuggestionIndex >= 0) {
+				selectSuggestion(filteredSuggestions[selectedSuggestionIndex]);
+			} else {
+				addLanguage();
+			}
+		} else if (event.key === 'Escape') {
+			showSuggestions = false;
+			selectedSuggestionIndex = -1;
+		}
+	}
+
+	function selectSuggestion(skill) {
+		newLanguage = skill;
+		showSuggestions = false;
+		selectedSuggestionIndex = -1;
+		addLanguage();
+	}
+
+	function handleClickOutside(event) {
+		if (!event.target.closest('.add-language')) {
+			showSuggestions = false;
+			selectedSuggestionIndex = -1;
+		}
+	}
+
+	async function loadMore() {
+		if (loadingMore) return;
+
+		loadingMore = true;
+		// Simulate loading delay for better UX
+		await new Promise((resolve) => setTimeout(resolve, 300));
+		displayLimit += 10;
+		loadingMore = false;
 	}
 </script>
 
@@ -92,20 +188,23 @@
 	{:else}
 		<div class="profile-header">
 			<h1>{auth.user.user_metadata?.user_name || auth.user.email}</h1>
-			<p>Manage your language preferences and development interests</p>
+			<p>Manage your skills and development interests</p>
 		</div>
 
 		<div class="section">
-			<h3>Your Languages</h3>
-			<p class="section-description">Add programming languages you're familiar with or interested in learning</p>
-			
+			<h3>Your Skills ({languages.length}/15)</h3>
+			<p class="section-description">
+				Add programming languages, frameworks, and tools you're familiar with or interested in
+				learning
+			</p>
+
 			{#if languages.length > 0}
 				<div class="language-tags">
 					{#each languages as language}
 						<div class="language-tag">
 							<span class="language-name">{language}</span>
-							<button 
-								class="remove-btn" 
+							<button
+								class="remove-btn"
 								onclick={() => removeLanguage(language)}
 								disabled={saving}
 								title="Remove {language}"
@@ -117,29 +216,98 @@
 				</div>
 			{:else}
 				<div class="empty-state">
-					<p>No languages added yet. Add some languages to personalize your experience!</p>
+					<p>No skills added yet. Add some skills to personalize your experience!</p>
 				</div>
 			{/if}
 
 			<div class="add-language">
 				<div class="input-group">
-					<input
-						type="text"
-						bind:value={newLanguage}
-						onkeydown={handleKeydown}
-						placeholder="Enter a programming language..."
-						disabled={saving}
-					/>
-					<button 
-						class="add-btn accent" 
+					<div class="input-wrapper">
+						<input
+							type="text"
+							bind:value={newLanguage}
+							onkeydown={handleKeydown}
+							oninput={handleInput}
+							placeholder="Enter a skill (e.g. python, flask, sveltekit)..."
+							disabled={saving}
+							autocomplete="off"
+						/>
+						{#if showSuggestions && filteredSuggestions.length > 0}
+							<div class="suggestions-dropdown">
+								{#each filteredSuggestions as suggestion, index}
+									<button
+										class="suggestion-item"
+										class:selected={index === selectedSuggestionIndex}
+										onclick={() => selectSuggestion(suggestion)}
+									>
+										{suggestion}
+									</button>
+								{/each}
+							</div>
+						{/if}
+					</div>
+					<button
+						class="add-btn accent"
 						onclick={addLanguage}
-						disabled={saving || !newLanguage.trim()}
+						disabled={saving || !newLanguage.trim() || languages.length >= 15}
 					>
 						<PlusIcon />
 						Add
 					</button>
 				</div>
 			</div>
+		</div>
+
+		<div class="section">
+			<h3>My List</h3>
+			<p class="section-description">Repositories you've saved for later</p>
+
+			{#if savedRepos.savedRepos.length > 0}
+				<div class="saved-repos-grid">
+					{#each savedRepos.savedRepos.slice(0, displayLimit) as savedRepo}
+						<div class="saved-repo-wrapper">
+							<RepoCard
+								repo={{
+									owner: savedRepo.repo_owner,
+									name: savedRepo.repo_name,
+									fullName: savedRepo.repo_full_name,
+									description: savedRepo.repo_description,
+									stars: savedRepo.repo_stars,
+									forks: 0,
+									language: savedRepo.repo_language,
+									openIssues: 0,
+									updatedAt: savedRepo.saved_at,
+									topics: []
+								}}
+							/>
+							<button
+								class="unsave-button"
+								onclick={() => savedRepos.unsaveRepo(savedRepo.repo_owner, savedRepo.repo_name)}
+								title="Remove from saved"
+							>
+								<XIcon />
+							</button>
+						</div>
+					{/each}
+				</div>
+
+				{#if savedRepos.savedRepos.length > displayLimit}
+					<div class="load-more-section">
+						<button class="button secondary" onclick={loadMore} disabled={loadingMore}>
+							{loadingMore
+								? 'Loading...'
+								: `Load More (${savedRepos.savedRepos.length - displayLimit} remaining)`}
+						</button>
+					</div>
+				{/if}
+			{:else}
+				<div class="empty-state">
+					<p>
+						No saved repositories yet. Browse repositories and click "Add to My List" to save them
+						here!
+					</p>
+				</div>
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -185,10 +353,6 @@
 	.language-tag {
 		display: flex;
 		align-items: center;
-		background: var(--bg-2);
-		border: 1px solid var(--bg-3);
-		border-radius: 6px;
-		padding: 0.5rem 0.75rem;
 		gap: 0.5rem;
 		transition: all 0.2s;
 	}
@@ -211,7 +375,6 @@
 		display: flex;
 		align-items: center;
 		padding: 0.125rem;
-		border-radius: 3px;
 		transition: all 0.2s;
 		opacity: 0;
 	}
@@ -232,7 +395,6 @@
 	.empty-state {
 		background: var(--bg-2);
 		border: 1px dashed var(--bg-3);
-		border-radius: 8px;
 		padding: 2rem;
 		text-align: center;
 		margin-bottom: 1.5rem;
@@ -244,7 +406,7 @@
 	}
 
 	.add-language {
-		max-width: 400px;
+		max-width: 600px;
 	}
 
 	.input-group {
@@ -252,11 +414,15 @@
 		gap: 0.75rem;
 	}
 
-	.input-group input {
+	.input-wrapper {
+		position: relative;
 		flex: 1;
+	}
+
+	.input-group input {
+		width: 100%;
 		padding: 0.75rem;
 		border: 1px solid var(--bg-3);
-		border-radius: 4px;
 		background: var(--bg-1);
 		color: var(--txt-1);
 		font-size: 0.875rem;
@@ -280,7 +446,8 @@
 		cursor: not-allowed;
 	}
 
-	.loading, .error {
+	.loading,
+	.error {
 		text-align: center;
 		padding: 3rem;
 		color: var(--txt-2);
@@ -289,5 +456,99 @@
 
 	.error {
 		color: #ef4444;
+	}
+
+	.saved-repos-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+		gap: 1.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.saved-repo-wrapper {
+		position: relative;
+	}
+
+	.unsave-button {
+		position: absolute;
+		top: 0.75rem;
+		right: 0.75rem;
+		background: var(--bg-1);
+		border: 1px solid var(--bg-3);
+		color: var(--txt-3);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.5rem;
+		transition: all 0.2s;
+		opacity: 0;
+	}
+
+	.saved-repo-wrapper:hover .unsave-button {
+		opacity: 1;
+	}
+
+	.unsave-button:hover {
+		background: var(--bg-2);
+		border-color: var(--acc-1);
+		color: var(--txt-1);
+	}
+
+	.unsave-button :global(.icon) {
+		font-size: 0.875rem;
+	}
+
+	.load-more-section {
+		display: flex;
+		justify-content: center;
+		margin-top: 1.5rem;
+	}
+
+	.load-more-section button {
+		min-width: 200px;
+	}
+
+	.suggestions-dropdown {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background: var(--bg-1);
+		border: 1px solid var(--bg-3);
+		border-top: none;
+		max-height: 200px;
+		overflow-y: auto;
+		z-index: 1000;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	}
+
+	.suggestion-item {
+		display: block;
+		width: 100%;
+		padding: 0.75rem;
+		text-align: left;
+		background: transparent;
+		border: none;
+		color: var(--txt-1);
+		cursor: pointer;
+		font-size: 0.875rem;
+		transition: background-color 0.15s ease;
+		border-bottom: 1px solid var(--bg-2);
+	}
+
+	.suggestion-item:last-child {
+		border-bottom: none;
+	}
+
+	.suggestion-item:hover,
+	.suggestion-item.selected {
+		background: var(--bg-2);
+		color: var(--acc-1);
+	}
+
+	.suggestion-item.selected {
+		background: var(--acc-1);
+		color: white;
 	}
 </style>
