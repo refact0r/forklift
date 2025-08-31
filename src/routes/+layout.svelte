@@ -96,6 +96,8 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 2rem;
+		z-index: 1001; /* Higher than loading indicator */
+		background: var(--bg-1); /* Ensure solid background */
 
 		a {
 			color: var(--txt-2);
@@ -122,11 +124,6 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-	}
-
-	.sign-in,
-	.sign-out {
-		/* Add styles if needed */
 	}
 
 	.profile-link {
@@ -165,7 +162,7 @@
 	}
 	.loading-indicator {
 		position: fixed;
-		top: 4rem;
+		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;

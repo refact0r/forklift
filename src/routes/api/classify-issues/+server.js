@@ -32,12 +32,13 @@ async function classifyIssues(repoContext, issues) {
 		.join('\n\n');
 
 	const prompt = `You are an assistant that classifies GitHub issues for new contributors.
-Use 1-3 difficulty scores where:
+
+For each issue, provide 1-3 difficulty scores where:
 1: Easy - Simple fixes, docs, typos, small enhancements
 2: Medium - Standard features, bug fixes requiring moderate code changes
 3: Hard - Complex features, architectural changes, deep system knowledge required
-
-Topics should be 2-5 lowercase tokens like: docs, api, testing, bug, feature, etc.
+For each issue, provide a list of 2-5 topics. Topics should be lowercase tokens like: docs, api, testing, bug, feature, etc.
+For each issue, provide a brief summary (≤20 words) of the issue.
 
 REPO: ${repoContext.name}
 DESCRIPTION: ${repoContext.description}
@@ -53,7 +54,7 @@ Return STRICT JSON array with exact structure for each issue:
   "title": string,
   "difficulty_score": 1-3,
   "topics": string[],
-  "rationale": string (≤20 words)
+  "summary": string (≤20 words) 
 }
 
 Return array of ${issues.length} objects only.`;
@@ -96,7 +97,7 @@ Return array of ${issues.length} objects only.`;
 					difficulty: difficulty,
 					difficulty_score: Math.max(1, Math.min(3, result.difficulty_score || 2)),
 					topics: cleanTopics(result.topics),
-					summary: (result.rationale || 'unknown').slice(0, 100)
+					summary: (result.summary || 'unknown').slice(0, 100)
 				}
 			};
 		});

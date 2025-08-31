@@ -112,7 +112,8 @@
 	.header-row {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
+		align-items: flex-start;
+		gap: 2rem;
 		margin-bottom: 1rem;
 	}
 
