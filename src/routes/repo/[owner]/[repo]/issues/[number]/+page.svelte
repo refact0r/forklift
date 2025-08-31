@@ -33,6 +33,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>forklift | {data.owner}/{data.repo} issue #{data.issue.number}</title>
+</svelte:head>
+
 <div class="container">
 	<div class="header">
 		<button class="back-btn" onclick={goBack}>← Back to Issues</button>

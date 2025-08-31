@@ -48,6 +48,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>forklift | for you</title>
+</svelte:head>
+
 <div class="content">
 	{#if error}
 		<div class="error-state">

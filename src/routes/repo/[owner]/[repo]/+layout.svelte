@@ -45,6 +45,10 @@
 	const isSaved = $derived(savedRepos.isRepoSaved(owner, repo));
 </script>
 
+<svelte:head>
+	<title>forklift | {owner}/{repo}</title>
+</svelte:head>
+
 <div class="content">
 	{#if error}
 		<div class="error-section">

@@ -31,6 +31,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>forklift | {data.owner}/{data.repo} issues</title>
+</svelte:head>
+
 {#if error}
 	<div class="error-section">
 		<h2>Error Loading Issues</h2>

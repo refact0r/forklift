@@ -14,6 +14,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>forklift | search</title>
+</svelte:head>
+
 <div class="content">
 	<div class="header">
 		<h1>search repositories</h1>

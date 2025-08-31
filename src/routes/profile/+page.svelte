@@ -180,6 +180,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>forklift | profile</title>
+</svelte:head>
+
 <div class="content">
 	{#if loading}
 		<div class="loading">loading...</div>
