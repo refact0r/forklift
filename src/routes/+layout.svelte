@@ -59,17 +59,28 @@
 			<button class="sign-in" onclick={handleSignIn}>sign in with github </button>
 		{/if}
 	</div>
-
-	{#if navigating.to}
-		<div class="loading-indicator">
-			<div class="loading-bar"></div>
-		</div>
-	{/if}
 </header>
 
 <main class:loading={navigating.to}>
 	{@render children?.()}
 </main>
+
+{#if navigating.to}
+	<div class="loading-indicator">
+		<div class="loading-content">
+			<div class="loading-spinner">
+				<div class="square"></div>
+				<div class="square"></div>
+				<div class="square"></div>
+				<div class="square"></div>
+			</div>
+			<div class="loading-messages">
+				<span class="loading-message">loading data...</span>
+				<span class="loading-subtitle">it may take a minute <br />to generate content</span>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	h1 {
@@ -152,31 +163,82 @@
 		position: relative;
 		overflow: hidden;
 	}
-	.loading {
-		opacity: 0.7;
-	}
 	.loading-indicator {
-		position: absolute;
+		position: fixed;
+		top: 4rem;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		height: 2px;
+		background: rgba(0, 0, 0, 0.4);
+		backdrop-filter: blur(3px);
 		z-index: 1000;
-		width: 100%;
-		overflow-x: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: 0.2s;
 	}
-	.loading-bar {
-		height: 100%;
+
+	.loading-content {
+		/* background: var(--bg-1);
+		border: 1px solid var(--bg-3); */
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+		/* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); */
+	}
+
+	.loading-messages {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.loading-subtitle {
+		color: var(--txt-2);
+	}
+
+	.loading-message {
+		font-size: 1.125rem;
+	}
+
+	.loading-spinner {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.375rem;
+		width: 2rem;
+		height: 2rem;
+	}
+
+	.square {
 		background: var(--acc-1);
-		width: 40%;
-		animation: loadingProgress 1s ease infinite;
+		animation: squarePulse 1.2s linear infinite;
 	}
-	@keyframes loadingProgress {
-		0% {
-			transform: translateX(-100%);
-		}
+
+	.square:nth-child(1) {
+		animation-delay: 0s;
+	}
+	.square:nth-child(2) {
+		animation-delay: 0.3s;
+	}
+	.square:nth-child(3) {
+		animation-delay: 0.6s;
+	}
+	.square:nth-child(4) {
+		animation-delay: 0.9s;
+	}
+
+	@keyframes squarePulse {
+		0%,
 		100% {
-			transform: translateX(250%);
+			opacity: 0.2;
+			transform: scale(0.8);
+		}
+		50% {
+			opacity: 1;
+			transform: scale(1);
 		}
 	}
 </style>
