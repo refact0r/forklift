@@ -20,18 +20,10 @@
 	<title>forklift | {data.owner}/{data.repo} issue #{data.issue.number}</title>
 </svelte:head>
 
-<div class="container">
-	<div class="header">
-		<button class="back-btn" onclick={goBack}>← Back to Issues</button>
-		<div class="issue-meta">
-			<div class="issue-number">#{data.issue.number}</div>
-			<h1 class="issue-title">{data.issue.title}</h1>
-			<div class="issue-info">
-				<span class="issue-state {data.issue.state}">{data.issue.state}</span>
-				<span class="issue-date">opened on {formatDate(data.issue.created_at)}</span>
-				<span class="issue-author">by {data.issue.user.login}</span>
-			</div>
-		</div>
+<div class="header">
+	<div class="header-row">
+		<h1>{data.issue.title}</h1>
+		<button class="button" onclick={openInGitHub}>github</button>
 	</div>
 	<div class="header-content">
 		<!-- <span class="issue-state {data.issue.state}">{data.issue.state}</span> -->
