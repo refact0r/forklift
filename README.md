@@ -16,4 +16,4 @@ this project was created for the [Roo Code Hackathon](https://roo-code-hackathon
 
 ## tech/stack
 
-Sveltekit, Github API, OpenAI API, Redis.
+Sveltekit, Redis, Github API, OpenAI API.
