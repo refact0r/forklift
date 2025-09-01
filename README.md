@@ -13,3 +13,7 @@ this project was created for the [Roo Code Hackathon](https://roo-code-hackathon
 - **issue classification** - automatically categorized issues by difficulty (easy/medium/hard) and topics
 - **implementation guides** - ai-generated suggestions for tackling specific issues
 - **personalized recommendations** - discover projects matching your skills and interests
+
+## tech/stack
+
+Sveltekit, Github API, OpenAI API, Redis.
