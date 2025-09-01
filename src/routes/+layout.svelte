@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { navigating } from '$app/state';
 	import { onMount } from 'svelte';
+	import { injectAnalytics } from '@vercel/analytics/sveltekit';
 	import GitIcon from '~icons/ph/git-fork';
 	import UserIcon from '~icons/ph/user';
 	import SignOutIcon from '~icons/ph/sign-out';
@@ -14,6 +15,7 @@
 
 	onMount(() => {
 		auth.initialize();
+		injectAnalytics();
 	});
 
 	async function handleSignIn() {
