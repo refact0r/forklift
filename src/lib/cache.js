@@ -44,12 +44,14 @@ export async function getFromCache(key) {
  * Set data in Redis cache
  * @param {string} key - Cache key
  * @param {any} data - Data to cache
- * @param {number} ttlSeconds - Time to live in seconds (default: 3600 = 1 hour)
+ * @param {number|null} ttlSeconds - Time to live in seconds (null = auto-determine based on key prefix)
  */
-export async function setCache(key, data, ttlSeconds = 3600) {
+export async function setCache(key, data, ttlSeconds = null) {
 	try {
 		const client = await getRedisClient();
-		await client.setEx(key, ttlSeconds, JSON.stringify(data));
+		// Use provided TTL or auto-determine based on key prefix
+		const finalTTL = ttlSeconds !== null ? ttlSeconds : getTTLByKey(key);
+		await client.setEx(key, finalTTL, JSON.stringify(data));
 	} catch (error) {
 		console.error('Cache set error:', error);
 		// Don't throw error - cache failures shouldn't break the app
@@ -80,13 +82,41 @@ export function generateCacheKey(prefix, ...parts) {
 }
 
 /**
+ * Get appropriate TTL based on cache key prefix
+ * @param {string} key - Cache key
+ * @returns {number} - TTL in seconds
+ */
+function getTTLByKey(key) {
+	const prefix = key.split(':')[0];
+	
+	switch (prefix) {
+		case 'repo':
+		case 'search':
+		case 'api':
+			// Repo summaries, search results, API responses - change less frequently
+			return 7 * 24 * 3600; // 7 days
+		case 'issues':
+		case 'issue':
+			// Issues are more dynamic - shorter cache
+			return 2 * 24 * 3600; // 2 days
+		case 'user':
+		case 'profile':
+			// User data - moderate cache
+			return 3 * 24 * 3600; // 3 days
+		default:
+			// Default fallback
+			return 24 * 3600; // 24 hours
+	}
+}
+
+/**
  * Cache wrapper function - gets from cache or executes function and caches result
  * @param {string} key - Cache key
  * @param {Function} fetchFunction - Function to execute if cache miss
- * @param {number} ttlSeconds - TTL in seconds
+ * @param {number|null} ttlSeconds - TTL in seconds (null = auto-determine based on key prefix)
  * @returns {Promise<any>} - Cached or fresh data
  */
-export async function cacheWrapper(key, fetchFunction, ttlSeconds = 10800) {
+export async function cacheWrapper(key, fetchFunction, ttlSeconds = null) {
 	// Try to get from cache first
 	const cachedData = await getFromCache(key);
 	if (cachedData !== null) {
@@ -99,7 +129,7 @@ export async function cacheWrapper(key, fetchFunction, ttlSeconds = 10800) {
 	try {
 		const freshData = await fetchFunction();
 
-		// Cache the result
+		// Cache the result with intelligent TTL
 		await setCache(key, freshData, ttlSeconds);
 
 		return freshData;
